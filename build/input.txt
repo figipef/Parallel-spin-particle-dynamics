@@ -1,0 +1,4 @@
+INPUT VALUES
+NUMBER_OF_PARTICLES=  	1
+TIME_STEP=            	0.1 s
+TOTAL_TIME=  			10  s
