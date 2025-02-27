@@ -4,39 +4,42 @@
 Particle::Particle(){}
 
 // Constructor
-Particle::Particle(double pos[3], double mom[3], double spin[3], int tag){
-
+Particle::Particle(double pos[3], double mom[3], double spn[3], int tg) : tag(tg) {
+    std::copy(pos, pos + 3, position);
+    std::copy(mom, mom + 3, momentum);
+    std::copy(spn, spn + 3, spin);
 }
 // Member functions to set values
-void Particle::setPosition(double[3]){
-
+void Particle::setPosition(double pos[3]){
+    std::copy(pos, pos + 3, position);
 }
-void Particle::setVelocity(double[3]){
-
+void Particle::setMomentum(double mom[3]){
+    std::copy(mom, mom + 3, momentum);
 }
-void Particle::setSpin(double[3]){
+void Particle::setSpin(double spn[3]){
+    std::copy(spn, spn + 3, spin);
 
 }
 // Member functions to get values
-double* Particle::getPosition() const{
-
+const double* Particle::getPosition() const{
+    return position;
 }
-double* Particle::getVelocity() const{
-
+const double* Particle::getMomentum() const{
+    return momentum;
 }
-double* Particle::getSpin() const{
-
+const double* Particle::getSpin() const{
+    return spin;
 }
-int Particle::getTag() const{
-
+const int Particle::getTag() const{
+    return tag;
 }
 // Functions to display values
 void Particle::display_positon() const{
-
+    std::cout << "[" << position[0] << ", " << position[1] << ", " << position[2] << "]\n";
 }
-void Particle::display_velocity() const{
-
+void Particle::display_momentum() const{
+    std::cout << "[" << momentum[0] << ", " << momentum[1] << ", " << momentum[2] << "]\n";
 }
 void Particle::display_spin() const{
-
+    std::cout << "[" << spin[0] << ", " << spin[1] << ", " << spin[2] << "]\n";
 }
