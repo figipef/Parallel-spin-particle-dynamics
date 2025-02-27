@@ -27,7 +27,7 @@ void createParticles(Particle* particles, int particle_number){
 
 }
 
-void PerformDiagnostics(std::ifstream& output_file, Particle* particles,  \
+void PerformDiagnostics(std::ifstream& output_file, Particle* particles, double time,  \
 	int particle_number, std::string par1, std::string par2, std::string par3, double b1_size, double b2_size, double b3_size, \
 	double b1_max, double b2_max, double b3_max, double b1_min, double b2_min, double b3_min){
 
