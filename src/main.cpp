@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 // CONSTANTS (almost)
 double MASS = 1; 
@@ -40,47 +41,96 @@ int main() {
     double time_step = std::stod(values["TIME_STEP"]);
     int total_time = std::stoi(values["TOTAL_TIME"]);
 
+    std::string *params = new std::string[3];
+    double *binsize = new double[3];
+    double *binmax = new double[3];
+    double *binmin = new double[3];
+    int n_par = 0;
+
     // Save the Diagnostics parameters to strings
-    std::string par1 = values["PAR1"];
-    std::string par2 = values["PAR2"];
-    std::string par3 = values["PAR3"];
+    params[0] = values["PAR1"];
+    params[1] = values["PAR2"];
+    params[2] = values["PAR3"];
 
     // Save the wanted Bin data
-    double bin1_size = std::stod(values["BIN_SIZE_1"]);
-    double bin2_size = std::stod(values["BIN_SIZE_2"]);
-    //double bin3_size = std::stod(values["BIN_SIZE_3"]);
+    
+    // Save the BinSize values to an array
+    if (!values["BIN_SIZE_1"].empty()){
+        binsize[0] = std::stod(values["BIN_SIZE_1"]);
+        n_par += 1;
+    }
+    if (!values["BIN_SIZE_2"].empty()){
+        binsize[1] = std::stod(values["BIN_SIZE_2"]);
+        n_par += 1;
+    }
+    if (!values["BIN_SIZE_3"].empty()){
+        binsize[2] = std::stod(values["BIN_SIZE_3"]);
+        n_par += 1;
+    }
 
-    double bin1_max = std::stod(values["B1_MAX"]);
-    double bin2_max = std::stod(values["B2_MAX"]);
-    //double bin3_max = std::stod(values["B3_MAX"]);
+    // Save the BinMax values to an array
+    if (!values["B1_MAX"].empty()){
+        binmax[0] = std::stod(values["B1_MAX"]);
+    }
+    if (!values["B2_MAX"].empty()){
+        binmax[1] = std::stod(values["B2_MAX"]);
+    }
+    if (!values["B3_MAX"].empty()){
+        binmax[2] = std::stod(values["B3_MAX"]);
+    }
 
-    double bin1_min = std::stod(values["B1_MIN"]);
-    double bin2_min = std::stod(values["B2_MIN"]);
-    //double bin3_min = std::stod(values["B3_MIN"]);
+    // Save the BinMin values to an array 
+    if (!values["B1_MIN"].empty()){
+        binmin[0] = std::stod(values["B1_MIN"]);
+    }
+    if (!values["B2_MIN"].empty()){
+        binmin[1] = std::stod(values["B2_MIN"]);
+    }
+    if (!values["B3_MIN"].empty()){
+        binmin[2] = std::stod(values["B3_MIN"]);
+    }
 
+    double* bin_n = new double[n_par]; 
+    for (int i = 0; i < n_par; i++){
+        bin_n[i] = (binmax[i] - binmin[i]) / binsize[i] + 1; 
+    }
 
     // ============================
     //   START OF MAIN CODE BLOCK
     // ============================
 
     Particle* particles = new Particle[particle_number];  // Array of pointers
-    /*
-    double mom[3] = {0,0,0};
-    double pos[3] = {0,0,0};
-    double spin[3] = {0,1,0};
 
-	for (int i = 0; i < particle_number; ++i) {
-	    particles[i] = new Particle(mom,pos,spin,i);  // Dynamically allocate objects
-	}
-    */
     createParticles(particles, particle_number);
+
+    for (double t = 0; t <= total_time; t += time_step){
+
+        std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
+
+        for (int i = 0; i < n_par; i++){
+            histograms[i] = std::vector<int>(bin_n[i], 0); // Create the histograms necessary
+        }
+
+        // Testing the Diagnostics
+
+
+        PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par);
+
+        for (int value : histograms[0]) {
+            std::cout << value << " ";
+        }
+
+    }
+
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
+
     particles[0].display_position();
     std::cout<< particles[0].getPosition()[1] <<std::endl;
     double newpos[3] = {0,0.5,0};
     particles[0].setPosition(newpos);
     std::cout<< particles[0].getPosition()[1] <<std::endl;
+
 	return 0;
 }

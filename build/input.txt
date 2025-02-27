@@ -1,13 +1,13 @@
 INPUT VALUES
 NUMBER_OF_PARTICLES=  	5
-TIME_STEP=            	0.1 s
-TOTAL_TIME=  			10  s
+TIME_STEP=            	1 s
+TOTAL_TIME=  			0.9  s
          DIAGNOSTICS
-PAR1=                   s1
+PAR1=                   s3
 PAR2=                   p3
 PAR3=                   
 BIN_SIZE_1=             1
-BIN_SIZE_2=             0.2
+BIN_SIZE_2=             
 BIN_SIZE_3= 
 B1_MAX=                 1
 B2_MAX=                 10
