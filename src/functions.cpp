@@ -17,8 +17,8 @@ void boris(Particle*& particles, double time_step, double E_field[3], double B_f
 }
 
 void createParticles(Particle* particles, int particle_number){
+	double pos[3] = {1,1.5,0};
 	double mom[3] = {1,1.5,0};
-    double pos[3] = {1,1.5,0};
     double spin[3] = {0,1,0};
 
 	for (int i = 0; i < particle_number; ++i) {
