@@ -48,15 +48,15 @@ int main() {
     // Save the wanted Bin data
     double bin1_size = std::stod(values["BIN_SIZE_1"]);
     double bin2_size = std::stod(values["BIN_SIZE_2"]);
-    double bin3_size = std::stod(values["BIN_SIZE_3"]);
+    //double bin3_size = std::stod(values["BIN_SIZE_3"]);
 
     double bin1_max = std::stod(values["B1_MAX"]);
     double bin2_max = std::stod(values["B2_MAX"]);
-    double bin3_max = std::stod(values["B3_MAX"]);
+    //double bin3_max = std::stod(values["B3_MAX"]);
 
     double bin1_min = std::stod(values["B1_MIN"]);
     double bin2_min = std::stod(values["B2_MIN"]);
-    double bin3_min = std::stod(values["B3_MIN"]);
+    //double bin3_min = std::stod(values["B3_MIN"]);
 
 
     // ============================
@@ -77,7 +77,10 @@ int main() {
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
-    std::cout<< test(12) <<std::endl;
-
+    particles[0].display_position();
+    std::cout<< particles[0].getPosition()[1] <<std::endl;
+    double newpos[3] = {0,0.5,0};
+    particles[0].setPosition(newpos);
+    std::cout<< particles[0].getPosition()[1] <<std::endl;
 	return 0;
 }

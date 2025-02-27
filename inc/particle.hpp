@@ -29,7 +29,7 @@ public:
     const int getTag() const;
 
     // Functions to display values
-    void display_positon() const;
+    void display_position() const;
     void display_momentum() const;
     void display_spin() const;
 

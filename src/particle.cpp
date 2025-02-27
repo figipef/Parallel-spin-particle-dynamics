@@ -34,7 +34,7 @@ const int Particle::getTag() const{
     return tag;
 }
 // Functions to display values
-void Particle::display_positon() const{
+void Particle::display_position() const{
     std::cout << "[" << position[0] << ", " << position[1] << ", " << position[2] << "]\n";
 }
 void Particle::display_momentum() const{
