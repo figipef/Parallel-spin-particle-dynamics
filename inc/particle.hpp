@@ -9,6 +9,8 @@ private:
     int tag;
 
 public:
+    // Default Constructor
+    Particle();
     // Constructor
     Particle(double[3], double[3], double[3], int);
 

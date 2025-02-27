@@ -45,16 +45,17 @@ int main() {
     //   START OF MAIN CODE BLOCK
     // ============================
 
-    Particle* particles[5];  // Array of pointers
-
+    Particle* particles = new Particle[particle_number];  // Array of pointers
+    /*
     double mom[3] = {0,0,0};
     double pos[3] = {0,0,0};
     double spin[3] = {0,1,0};
 
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < particle_number; ++i) {
 	    particles[i] = new Particle(mom,pos,spin,i);  // Dynamically allocate objects
 	}
-
+    */
+    createParticles(particles, particle_number);
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================

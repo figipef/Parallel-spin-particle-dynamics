@@ -1,5 +1,8 @@
 #include "particle.hpp"
 
+// Default Consctructor
+Particle::Particle(){}
+
 // Constructor
 Particle::Particle(double pos[3], double mom[3], double spin[3], int tag){
 
