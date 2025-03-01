@@ -127,3 +127,103 @@ void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
     	hist[k][index]++;  // Increment corresponding bin
 	}
 }
+
+void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, std::string*& params, double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par){
+
+	/*
+	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
+	*/
+
+    std::unordered_map<std::string, std::string> values;
+    std::string line;
+    
+    // Extract the values line by line from the input file and store
+    while (std::getline(input_file, line)) {
+        std::istringstream iss(line);
+        std::string key, value, unit;
+        
+        if (std::getline(iss, key, '=')) {
+            iss >> value >> unit; // Extract value and unit
+            values[key] = value;  // Store value in the map
+        }
+    }
+    input_file.close();
+
+    // Save the input values to usable variables
+
+    particle_n = std::stoi(values["NUMBER_OF_PARTICLES"]);
+    timestep = std::stod(values["TIME_STEP"]);
+    totaltime = std::stod(values["TOTAL_TIME"]);
+
+    // Initalize counters for the bin parameters
+
+    n_par = 1;
+    int nbs = 1;
+    int bM = 1;
+    int bm = 1;
+
+    auto it = values.begin(); // Iterator for the map
+
+    while (it != values.end()) {
+
+    	if ("PAR"+std::to_string(n_par) == it->first && !it->second.empty()){
+
+    		// Checkers to accept correct param definition
+    		if (it->second.length() != 2){
+    			throw std::runtime_error("Invalid Parameter for Parameter= " +  std::to_string(n_par) + "; parameter not the right size");
+    		}
+
+    		if (it->second[0] != 's' && it->second[0] != 'm' && it->second[0] != 'p'){
+    			throw std::runtime_error("Invalid Parameter for Parameter= " +  std::to_string(n_par) + "; not a valid character at position 0");
+    		}
+
+    		if (!std::isdigit(it->second[1])){
+    			throw std::runtime_error("Invalid Parameter for Parameter= " +  std::to_string(n_par) + "; not a digit at position 1");
+    		}
+
+    		params[n_par - 1] = it->second; // Save it to the array
+    		n_par += 1; // Counter update
+    		it = values.begin(); // Restart Iterator
+    	}
+
+    	if ("BIN_SIZE_"+std::to_string(nbs) == it->first && !it->second.empty()){
+
+    		binsize[nbs - 1] =std::stod(it->second);// Save it to the array
+    		nbs += 1;// Counter update
+    		it = values.begin();// Restart Iterator
+    	}
+
+    	if ("BIN_MAX_"+std::to_string(bM) == it->first && !it->second.empty()){
+    		
+    		binmax[bM - 1] =std::stod(it->second); // Save it to the array
+    		bM += 1; // Counter update
+    		it = values.begin(); // Restart Iterator
+
+    	}
+
+    	if ("BIN_MIN_"+std::to_string(bm) == it->first && !it->second.empty()){
+
+    		binmin[bm - 1] =std::stod(it->second); // Save it to the array
+    		bm += 1; // Counter update
+    		it = values.begin(); // Restart Iterator
+
+    	}
+    	it ++;
+    }
+
+    // Check if the number of variables is the same for every bin parameter and parameters
+    if (n_par != bm || n_par != bM || n_par != nbs){
+    	throw std::runtime_error("Number of Input parameters does not match the bin parameters");
+    }
+
+    n_par -= 1;
+
+    for (int i = 0; i < n_par; i++){
+
+        bin_n[i] = (binmax[i] - binmin[i]) / binsize[i] + 1; // Calculate the size of the histogram
+
+        if (bin_n[i] < 1){
+        	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
+        }
+    }
+}
