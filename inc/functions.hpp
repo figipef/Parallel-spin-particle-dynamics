@@ -2,8 +2,10 @@
 
 #include "particle.hpp"
 #include <vector>
-#include <fstream> // Removable
+#include <fstream>
 #include <iostream>
+#include <unordered_map>
+#include <sstream>
 #include <cmath> 
 
 int test(int);
@@ -17,3 +19,4 @@ void PerformDiagnostics(std::vector<int>*&, Particle*,  \
 	int , std::string , std::string , std::string , double , double , double, \
 	double , double , double , double , double , double );
 void PerformDiagnostics(std::vector<int>*&, Particle,std::string*, double*, double*, double*, int);
+void setupInputVariable(std::ifstream&, int&, double&, double&, std::string*&, double*&, double*&, double*&, double*&, int&);
