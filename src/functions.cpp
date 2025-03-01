@@ -4,12 +4,23 @@ int test(int a){
 	return a + 123;
 }
 
+// Calculate the cross product of two vectors
 double* cross(double a[3], double b[3]) {
-
+	double* c = new double[3];
+	c[0] = a[1]*b[2] - a[2]*b[1];
+	c[1] = a[2]*b[0] - a[0]*b[2];
+	c[2] = a[0]*b[1] - a[1]*b[0];
+	return c;
 }
 
-double gamma(double u[3]){
+// Calculate the inner product of two vectors
+double inner(double a[3], double b[3]){
+	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
 
+// Calculate the lorentz factor of a particle with generalized velocity u
+double gamma(double u[3]){
+	return sqrt(1. + inner(u, u));
 }
 
 void boris(Particle*& particles, double time_step, double E_field[3], double B_field[3], int n_of_particles){
