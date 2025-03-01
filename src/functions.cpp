@@ -1,5 +1,10 @@
 #include "functions.hpp"
 
+// CONSTANTS (almost)
+double MASS = 1; 
+double CHARGE = 1;
+double G = 1;
+
 int test(int a){
 	return a + 123;
 }
@@ -25,17 +30,72 @@ double gamma(double u[3]){
 
 void boris(Particle*& particles, double time_step, double E_field[3], double B_field[3], int n_of_particles){
 
-}
+	for (int i = 0; i < n_of_particles; i++){
+
+		double p_minus[3];
+		for (int j= 0; j <3; j++){
+			p_minus[j] = particles[i].getMomentum()[j] + time_step * CHARGE / 2. * E_field[j]; // First step, perform halfstep due to E 
+		}
+
+		double t[3];
+		double gamma_n = gamma(p_minus);
+
+		for (int j= 0; j <3; j++){
+			t[j] = B_field[j] * CHARGE * time_step / (gamma_n * MASS * 2); // Auxliary definition of t 
+		}
+
+		double* aux_p_line = cross(p_minus, t);
+		double p_line[3];
+
+		for (int j= 0; j <3; j++){
+			p_line[j] = p_minus[j] +  aux_p_line[j]; // Auxliary definition of p' 
+		}
+
+		double t_square = inner(t,t);
+
+		double s[3];
+
+		for (int j= 0; j <3; j++){
+			s[j] = 2 * t[j] / (1 + t_square); // Auxliary definition of s
+		}
+
+		double* p_plus_aux = cross(p_line, s);
+
+		double p_plus[3];
+		for (int j= 0; j <3; j++){
+			p_plus[j] = p_minus[j] +  p_plus_aux[j]; // Definition of p+ by performing a full rotation
+		}
+
+		double new_p[3];
+		for (int j= 0; j <3; j++){
+			new_p[j] = p_plus[j] + time_step * CHARGE / 2 * E_field[j]; // Auxliary definition of t 
+		}
+
+		particles[i].setMomentum(new_p);
+		double new_gamma = gamma(new_p);
+
+		double new_v[3];
+		for (int j= 0; j <3; j++){
+			new_v[j] = new_p[j] / (new_gamma * MASS); // Auxliary definition of t 
+		}
+
+		double new_pos[3];
+		for (int j= 0; j <3; j++){
+			new_pos[j] = particles[i].getPosition()[j] + time_step * new_v[j]; // Auxliary definition of t 
+		}
+
+		particles[i].setPosition(new_pos);
+	}
+} 
 
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {1,1.5,0};
-	double mom[3] = {1,1.5,0};
+	double pos[3] = {0,0,0};
+	double mom[3] = {1,0,0};
     double spin[3] = {-1,0,1};
 
 	for (int i = 0; i < particle_number; ++i) {
-	    particles[i] = Particle(mom,pos,spin,i);  // Dynamically allocate objects
+	    particles[i] = Particle(pos,mom,spin,i);  // Dynamically allocate objects
 	}
-
 }
 
 void PerformDiagnostics(std::vector<int>*& hist, Particle* particles,  \

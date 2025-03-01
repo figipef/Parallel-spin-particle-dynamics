@@ -7,10 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-// CONSTANTS (almost)
-double MASS = 1; 
-double CHARGE = 1;
-double G = 1;
 
 int main() {
 
@@ -39,7 +35,10 @@ int main() {
 
     // Setup the variables
     setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par);
-   
+    
+    double Efield[3] = {0,0,0};
+    double Bfield[3] = {0,0,1};
+
     // ============================
     //   START OF MAIN CODE BLOCK
     // ============================
@@ -48,22 +47,27 @@ int main() {
 
     createParticles(particles, particle_number);
 
+    particles[0].display_position();
+
     for (double t = 0; t <= total_time; t += time_step){
 
         std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
 
         for (int i = 0; i < n_par; i++){
-            std::cout <<"a  "<<bin_n[i]<<std::endl;
+            //std::cout <<"a  "<<bin_n[i]<<std::endl;
             histograms[i] = std::vector<int>(bin_n[i], 0); // Create the histograms necessary
         }
         
+        boris(particles, time_step, Efield, Bfield, particle_number);
+        particles[0].display_position();
+
         // Testing the Diagnostics
 
-        PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par); // use in the boris pusher
+        //PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par); // use in the boris pusher
 
-        for (int value : histograms[0]) {
-            std::cout << value << " ";
-        }
+        //for (int value : histograms[0]) {
+        //    std::cout << value << " ";
+        //}
 
     }
 
