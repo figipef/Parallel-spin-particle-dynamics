@@ -73,7 +73,14 @@ int main() {
 
     particles[0].display_position();
     std::cout<< particles[0].getPosition()[1] <<std::endl;
-    double newpos[3] = {0,0.5,0};
+    double newpos[3] = {1,1,2};
+    double teste[3] = {1,0,1};
+
+    double* a = cross(newpos, teste);
+    double b = inner(newpos, teste);
+    std::cout << "Cross product: "<<a[0]<<", "<<a[1]<<", "<<a[2]<<std::endl;
+    std::cout << "Inner Product: "<<b<<std::endl;
+    
     particles[0].setPosition(newpos);
     std::cout<< particles[0].getPosition()[1] <<std::endl;
 
