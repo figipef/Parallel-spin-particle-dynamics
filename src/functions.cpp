@@ -3,6 +3,9 @@
 //Constants
 double a = 0.00116; //anomalous magetic moment
 
+
+
+
 int test(int a){
 	return a + 123;
 }
@@ -39,6 +42,54 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){ //a is the a
 
 void boris(Particle*& particles, double time_step, double E_field[3], double B_field[3], int n_of_particles){
 
+	for (int i = 0; i < n_of_particles; ++i) {
+		Particle& p = particles[i];
+
+		// 1st E half-step
+		double u_minus[3];
+		for (int j = 0; j < 3; ++j) {
+			u_minus[j] = p.getMomentum()[j] + (charge * time_step / (2.0 * mass)) * E_field[j];
+		}
+
+        // auxiliary vector t
+        double t_vec[3];
+        double factor = charge * time_step / (2.0 * p.mass * gamma(u_minus));
+        for (int j = 0; j < 3; ++j) {
+            t_vec[j] = factor * B_field[j];
+        }
+        double t2 = inner(t_vec,t_vec);
+        
+        // auxiliary vector s 
+        double s_vec[3];
+        for (int j = 0; j < 3; ++j) {
+            s_vec[j] = 2.0 * t_vec[j] / (1.0 + t2);
+        }
+        
+        // B rotation
+        double u_prime[3];
+		double* uct = cross(u_minus, t_vec);
+		for (int j = 0; j < 3; ++j) {
+			u_prime[j] = u_minus[j] + uct[j];
+		}
+        
+		double u_plus[3];
+		double* ucs = cross(u_prime, s_vec);
+		for (int j = 0; j < 3; ++j) {
+			u_plus[j] = u_minus[j] + ucs[j];
+		}
+        
+        // 2nd E half-step
+        double u_next[3];
+        for (int j = 0; j < 3; ++j) {
+            u_next[j] = u_plus[j] + (charge * time_step / (2.0 * mass)) * E_field[j];
+        }
+        
+        // Update the particle's momentum
+		p.setMomentum(u_next);
+
+		double gamma = gamma(u_next);
+
+    }
 }
 
 void createParticles(Particle* particles, int particle_number){
