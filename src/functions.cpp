@@ -31,7 +31,7 @@ double gamma(double u[3]){
 }
 
 //Calculate the spin precession vector, according to the BMT eq, all quantities, including gamma, should be in n+1/2 time (momentum time)
-double* Omega(double gamma, double u[3], double E[3], double B[3]){ //a is the anomalous mag mom, theres gotta be a smarter way to do this
+double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	double* Om = new double[3];
 	double* ucE = cross(u, E); //u cross E
 	double udB = inner(u, B); // u dot B
@@ -93,15 +93,44 @@ void boris(Particle*& particles, double time_step, double E_field[3], double B_f
 
 		double new_v[3];
 		for (int j= 0; j <3; j++){
-			new_v[j] = u_next[j] / (new_gamma * MASS); // Auxliary definition of t 
+			new_v[j] = u_next[j] / (new_gamma * MASS);  
 		}
 
 		double new_pos[3];
 		for (int j= 0; j <3; j++){
-			new_pos[j] = particles[i].getPosition()[j] + time_step * new_v[j]; // Auxliary definition of t 
+			new_pos[j] = particles[i].getPosition()[j] + time_step * new_v[j]; 
 		}
 
 		particles[i].setPosition(new_pos);
+
+		//Spin update
+
+		// reusing auxiliary vectors t and s
+        factor = time_step / 2.0;
+		double* Om = Omega(new_gamma, u_next, E_field, B_field);
+        for (int j = 0; j < 3; ++j) {
+            t_vec[j] = factor * Om[j];
+        }
+        t2 = inner(t_vec,t_vec);
+
+		for (int j = 0; j < 3; ++j) {
+            s_vec[j] = 2.0 * t_vec[j] / (1.0 + t2);
+        }
+
+		double* spn = new double[3];  // Dynamically allocate memory
+		std::copy(p.getSpin(), p.getSpin() + 3, spn);
+		double spn_prime[3];
+		double* sct = cross(spn, t_vec);
+		for (int j = 0; j < 3; ++j) {
+			spn_prime[j] = spn[j] + sct[j];
+		}
+        
+		double spn_next[3];
+		double* scs = cross(spn_prime, s_vec);
+		for (int j = 0; j < 3; ++j) {
+			spn_next[j] = spn[j] + scs[j];
+		}
+		p.setSpin(spn_next);
 
     }
 }

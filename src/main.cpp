@@ -66,7 +66,9 @@ int main() {
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
 
-    //particles[0].display_position();
+    particles[0].display_position();
+    particles[0].display_momentum();
+    particles[0].display_spin();
     //std::cout<< particles[0].getPosition()[1] <<std::endl;
     //double newpos[3] = {1,1,2};
     //double teste[3] = {1,0,1};
@@ -80,13 +82,17 @@ int main() {
     //std::cout<< particles[0].getPosition()[1] <<std::endl;
 
     // testing omega
-    double u[3] = {1,0,0};
+    //double u[3] = {1,0,0};
     double E[3] = {0,1,0};
     double B[3] = {0,0,1};
+    //double s[3] = {0,0,0.5};
+    //double x[3] = {0,0,0};
+    std::cout<< "Updating, 1 step" <<std::endl;
 
-    double* om = Omega(1.41, u , E, B);
-    std::cout << "Omega: "<<om[0]<<", "<<om[1]<<", "<<om[2]<<std::endl;
-    
+    boris(particles, 0.1, E, B, 1);
+    particles[0].display_position();
+    particles[0].display_momentum();
+    particles[0].display_spin();
 
 	return 0;
 }
