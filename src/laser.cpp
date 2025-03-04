@@ -1,5 +1,6 @@
 #include "laser.hpp"
 
+Laser::Laser(){} // Default Constructor
 
 Laser::Laser(double _e_0[3], double _k[3], int _tag) : tag(_tag){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
@@ -68,3 +69,7 @@ double* Laser::get_E_0(){
 double* Laser::get_B_0(){
 	return b_0;
 } 
+
+void Laser::set_B_0(double new_B[3]){
+	std::copy(new_B, new_B + 3, b_0);
+}

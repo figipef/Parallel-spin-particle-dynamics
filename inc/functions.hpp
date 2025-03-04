@@ -15,7 +15,7 @@ double* cross(double[3], double[3]);
 double* Omega(double, double[3], double[3], double[3]);
 double inner(double[3], double[3]);
 double gamma(double[3]);
-void boris(Particle*&, double, double[3], double[3], int);
+void boris(Particle*&, Laser*, double,  int, int);
 void createParticles(Particle*, int);
 void PerformDiagnostics(std::vector<int>*&, Particle*,  \
 	int , std::string , std::string , std::string , double , double , double, \
