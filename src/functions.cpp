@@ -56,8 +56,8 @@ void boris(Particle*& particles, Laser* lasers, double time_step,  int n_of_lase
 			// Cycle to add and get the s Electric and Magnetic Fields
 
 			for (int k = 0; k < 3; ++k) {
-				E_field[j] = lasers[j].get_E_0()[k];
-				B_field[j] = lasers[j].get_B_0()[k];
+				E_field[k] = lasers[j].get_E_0()[k];
+				B_field[k] = lasers[j].get_B_0()[k];
 			}
 		}
 
