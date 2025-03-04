@@ -91,7 +91,6 @@ int main() {
 
     double* om = Omega(1.41, u , E, B);
     std::cout << "Omega: "<<om[0]<<", "<<om[1]<<", "<<om[2]<<std::endl;
-    std::cout <<"lal"<<std::endl;
     
 
 	return 0;
