@@ -43,8 +43,6 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 
 void boris(Particle*& particles, Laser* lasers, double time_step,  int n_of_lasers, int n_of_particles){
  	// NECESSÁRIO ADICIONAR TEMPO!!!! PARA DEPOIS CALCULAR OS CAMPOS DEPENDENTES DO TEMPO 
-	double E_field[3];
-	double B_field[3];
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
