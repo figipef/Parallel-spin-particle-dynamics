@@ -39,9 +39,18 @@ int main() {
     //   START OF MAIN CODE BLOCK
     // ============================
 
+    // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
     createParticles(particles, particle_number);
+
+    // Create the Laser array
+    Laser* lasers =  new Laser[1];
+    double E_field[3] = {0,1,0};
+    double k[3] = {1,0,0}; 
+    lasers[0] = Laser(E_field,k,0);
+    
+    std::cout << "Magnetic field 0: "<<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<<std::endl;
 
     for (double t = 0; t <= total_time; t += time_step){
 
@@ -89,7 +98,7 @@ int main() {
     //double x[3] = {0,0,0};
     std::cout<< "Updating, 1 step" <<std::endl;
 
-    boris(particles, 0.1, E, B, 1);
+    boris(particles,lasers, 0.1 , 1, 1);
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();

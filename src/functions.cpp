@@ -41,9 +41,26 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	return Om;
 }
 
-void boris(Particle*& particles, double time_step, double E_field[3], double B_field[3], int n_of_particles){
+void boris(Particle*& particles, Laser* lasers, double time_step,  int n_of_lasers, int n_of_particles){
+ 	// NECESSÁRIO ADICIONAR TEMPO!!!! PARA DEPOIS CALCULAR OS CAMPOS DEPENDENTES DO TEMPO 
+	double E_field[3];
+	double B_field[3];
 
 	for (int i = 0; i < n_of_particles; ++i) {
+
+		double E_field[3] = {0,0,0};
+		double B_field[3] = {0,0,0};
+
+		for (int j = 0; j < n_of_lasers; ++j){
+
+			// Cycle to add and get the s Electric and Magnetic Fields
+
+			for (int k = 0; k < 3; ++k) {
+				E_field[j] = lasers[j].get_E_0()[k];
+				B_field[j] = lasers[j].get_B_0()[k];
+			}
+		}
+
 		Particle& p = particles[i];
 
 		// 1st E half-step
