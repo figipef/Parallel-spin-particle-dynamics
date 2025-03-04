@@ -15,7 +15,7 @@ public:
     // Default Constructor
     Particle();
     // Constructor
-    Particle(double[3], double[3], double[3], int);
+    Particle(double[3], double[3], double[3], int); // initial position, momento, spin and tag
 
     // Member functions to set values
     void setPosition(double[3]);

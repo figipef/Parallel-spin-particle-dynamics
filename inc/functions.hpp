@@ -1,6 +1,7 @@
 #pragma once
 
 #include "particle.hpp"
+#include "laser.hpp"
 #include <vector>
 #include <fstream>
 #include <iostream>
