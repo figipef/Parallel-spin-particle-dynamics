@@ -72,6 +72,8 @@ void boris(Particle*& particles, double time_step, double E_field[3], double B_f
 		}
 
 		particles[i].setMomentum(new_p);
+
+		// Now we update the particle position with the new momentum
 		double new_gamma = gamma(new_p);
 
 		double new_v[3];
