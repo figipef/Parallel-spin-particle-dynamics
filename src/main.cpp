@@ -71,18 +71,27 @@ int main() {
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
 
-    particles[0].display_position();
-    std::cout<< particles[0].getPosition()[1] <<std::endl;
-    double newpos[3] = {1,1,2};
-    double teste[3] = {1,0,1};
+    //particles[0].display_position();
+    //std::cout<< particles[0].getPosition()[1] <<std::endl;
+    //double newpos[3] = {1,1,2};
+    //double teste[3] = {1,0,1};
 
-    double* a = cross(newpos, teste);
-    double b = inner(newpos, teste);
-    std::cout << "Cross product: "<<a[0]<<", "<<a[1]<<", "<<a[2]<<std::endl;
-    std::cout << "Inner Product: "<<b<<std::endl;
+    //double* a = cross(newpos, teste);
+    //double b = inner(newpos, teste);
+    //std::cout << "Cross product: "<<a[0]<<", "<<a[1]<<", "<<a[2]<<std::endl;
+    //std::cout << "Inner Product: "<<b<<std::endl;
     
-    particles[0].setPosition(newpos);
-    std::cout<< particles[0].getPosition()[1] <<std::endl;
+    //particles[0].setPosition(newpos);
+    //std::cout<< particles[0].getPosition()[1] <<std::endl;
+
+    // testing omega
+    double u[3] = {1,0,0};
+    double E[3] = {0,1,0};
+    double B[3] = {0,0,1};
+
+    double* om = Omega(1.41, u , E, B);
+    std::cout << "Omega: "<<om[0]<<", "<<om[1]<<", "<<om[2]<<std::endl;
+    
 
 	return 0;
 }

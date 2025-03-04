@@ -12,6 +12,7 @@
 int test(int);
 
 double* cross(double[3], double[3]);
+double* Omega(double, double[3], double[3], double[3]);
 double inner(double[3], double[3]);
 double gamma(double[3]);
 void boris(Particle*, double, double[3], double[3], int);

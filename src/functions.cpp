@@ -1,5 +1,8 @@
 #include "functions.hpp"
 
+//Constants
+double a = 0.00116; //anomalous magetic moment
+
 int test(int a){
 	return a + 123;
 }
@@ -21,6 +24,17 @@ double inner(double a[3], double b[3]){
 // Calculate the lorentz factor of a particle with generalized velocity u
 double gamma(double u[3]){
 	return sqrt(1. + inner(u, u));
+}
+
+//Calculate the spin precession vector, according to the BMT eq, all quantities, including gamma, should be in n+1/2 time (momentum time)
+double* Omega(double gamma, double u[3], double E[3], double B[3]){ //a is the anomalous mag mom, theres gotta be a smarter way to do this
+	double* Om = new double[3];
+	double* ucE = cross(u, E); //u cross E
+	double udB = inner(u, B); // u dot B
+	for (int i = 0; i < 3; i++){
+		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
+	}
+	return Om;
 }
 
 void boris(Particle*& particles, double time_step, double E_field[3], double B_field[3], int n_of_particles){
