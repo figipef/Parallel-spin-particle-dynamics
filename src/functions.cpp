@@ -1,10 +1,11 @@
 #include "functions.hpp"
 
-//Constants
+// CONSTANTS (almost)
+
+double MASS = 1; 
+double CHARGE = 1;
+double G = 1;
 double a = 0.00116; //anomalous magetic moment
-
-
-
 
 int test(int a){
 	return a + 123;
@@ -48,12 +49,12 @@ void boris(Particle*& particles, double time_step, double E_field[3], double B_f
 		// 1st E half-step
 		double u_minus[3];
 		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p.getMomentum()[j] + (charge * time_step / (2.0 * mass)) * E_field[j];
+			u_minus[j] = p.getMomentum()[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
 		}
 
         // auxiliary vector t
         double t_vec[3];
-        double factor = charge * time_step / (2.0 * p.mass * gamma(u_minus));
+        double factor = CHARGE * time_step / (2.0 * MASS * gamma(u_minus));
         for (int j = 0; j < 3; ++j) {
             t_vec[j] = factor * B_field[j];
         }
@@ -81,7 +82,7 @@ void boris(Particle*& particles, double time_step, double E_field[3], double B_f
         // 2nd E half-step
         double u_next[3];
         for (int j = 0; j < 3; ++j) {
-            u_next[j] = u_plus[j] + (charge * time_step / (2.0 * mass)) * E_field[j];
+            u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
         }
         
         // Update the particle's momentum

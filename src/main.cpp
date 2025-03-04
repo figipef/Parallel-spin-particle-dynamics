@@ -7,11 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-// CONSTANTS (almost)
-double MASS = 1; 
-double CHARGE = 1;
-double G = 1;
-
 int main() {
 
     // ============================
