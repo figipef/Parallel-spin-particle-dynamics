@@ -154,12 +154,12 @@ void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_parti
 }
 
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {1,1.5,0};
-	double mom[3] = {1,1.5,0};
+	double pos[3] = {1,0,0};
+	double mom[3] = {1,0,0};
     double spin[3] = {-1,0,1};
 
 	for (int i = 0; i < particle_number; ++i) {
-	    particles[i] = Particle(mom,pos,spin,i);  // Dynamically allocate objects
+	    particles[i] = Particle(pos,mom,spin,i);  // Dynamically allocate objects
 	}
 }
 

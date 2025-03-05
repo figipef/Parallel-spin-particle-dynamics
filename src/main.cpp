@@ -88,9 +88,9 @@ int main() {
         writeToFile(file_mom, particles[0], 'm');
         writeToFile(file_spn, particles[0], 's');
 
-        particles[0].display_position();
-        particles[0].display_momentum();
-        particles[0].display_spin();
+        //particles[0].display_position();
+        //particles[0].display_momentum();
+        //particles[0].display_spin();
     }
 
 	// ===========================
