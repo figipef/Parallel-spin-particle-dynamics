@@ -34,7 +34,11 @@ int main() {
 
     // Setup the variables
     setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par);
-   
+    
+    std::ofstream file_pos("output_position.txt");
+    std::ofstream file_mom("output_momentum.txt");
+    std::ofstream file_spn("output_spin.txt");
+
     // ============================
     //   START OF MAIN CODE BLOCK
     // ============================
@@ -46,14 +50,22 @@ int main() {
 
     // Create the Laser array
     Laser* lasers =  new Laser[1];
-    double E_field[3] = {0,1,0};
+    double E_field[3] = {0,0,0};
     double k[3] = {1,0,0}; 
     lasers[0] = Laser(E_field,k,0);
-    
+    double B_field[3] = {0,0,1};
+    lasers[0].set_B_0(B_field);
+
+    std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
+
     std::cout << "Magnetic field 0: "<<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<<std::endl;
 
-    for (double t = 0; t <= total_time; t += time_step){
+    particles[0].display_position();
+    particles[0].display_momentum();
+    particles[0].display_spin();
 
+    for (double t = 0; t <= total_time; t += time_step){
+        /*
         std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
 
         for (int i = 0; i < n_par; i++){
@@ -68,7 +80,17 @@ int main() {
         for (int value : histograms[0]) {
             std::cout << value << " ";
         }
+        */
 
+        boris(particles,lasers, time_step, particle_number, 1);
+
+        writeToFile(file_pos, particles[0], 'p');
+        writeToFile(file_mom, particles[0], 'm');
+        writeToFile(file_spn, particles[0], 's');
+
+        particles[0].display_position();
+        particles[0].display_momentum();
+        particles[0].display_spin();
     }
 
 	// ===========================
@@ -98,7 +120,6 @@ int main() {
     //double x[3] = {0,0,0};
     std::cout<< "Updating, 1 step" <<std::endl;
 
-    boris(particles,lasers, 0.1 , 1, 1);
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();

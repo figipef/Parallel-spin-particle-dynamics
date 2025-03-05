@@ -1,7 +1,7 @@
 INPUT VALUES
-NUMBER_OF_PARTICLES=  	5
-TIME_STEP=            	1 s
-TOTAL_TIME=  			0.9  s
+NUMBER_OF_PARTICLES=  	2
+TIME_STEP=            	0.1 s
+TOTAL_TIME=  			10  s
          DIAGNOSTICS
 PAR1=                   s1
 PAR2=                   p2
