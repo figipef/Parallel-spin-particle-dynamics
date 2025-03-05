@@ -11,7 +11,10 @@ private:
 	double b_0[3]; // Magnetic field vector
 	double k[3]; // Wave vector
 	double freq; // frequency calculated from wave vector
+	double env_freq; // frequency for the envelope
+	double length; // length of the envelope
 	int tag; // Tag for identification
+	int env;
 
 public:
 
@@ -19,6 +22,8 @@ public:
 	Laser();
 	// constructor
 	Laser(double[3], double[3], int); // intensity vector (Eletric), wavevector, tag
+	// constructor for an envelope
+	Laser(double[3], double[3], int, double, double); // intensity vector (Eletric), wavevector, tag
 	
 	double* get_E(double[3], double); // Return the true electric field at a point at a time
 	double* get_B(double[3], double); // Return the true magnetic field at a point at a time

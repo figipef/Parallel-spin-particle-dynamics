@@ -12,6 +12,20 @@ Laser::Laser(double _e_0[3], double _k[3], int _tag) : tag(_tag){
 
 	freq = 1. * sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]); // calculate the frequency based on the wave vector
 
+	env = 0; // env is defined to know if it is initalized
+}
+
+Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq) : tag(_tag), length(_length), env_freq(_env_freq){
+	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
+	std::copy(_k, _k+3, k); // copy the wave vector _k to k
+
+	b_0[0] = (k[1]*e_0[2] - k[2]*e_0[1])/1.; // calculate the cross product the  must be divided by c=1
+	b_0[1] = (k[2]*e_0[0] - k[0]*e_0[2])/1.;
+	b_0[2] = (k[0]*e_0[1] - k[1]*e_0[0])/1.;
+
+	freq = 1. * sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]); // calculate the frequency based on the wave vector
+
+	env = 1;
 }
 
 double* Laser::get_E(double pos[3], double t){
@@ -72,4 +86,34 @@ const double* Laser::get_B_0() const {
 
 void Laser::set_B_0(double new_B[3]){
 	std::copy(new_B, new_B + 3, b_0);
+}
+
+// Calculate the electric and magnetic field considering the envelope of the laser
+double* get_fields_envelope(double pos[3], double t){
+
+	if (env != 1){throw std::runtime_error("Envelope not initalized");}
+
+	double* fields = new double[6]; // E[3] x B[3] an array with the eletric and magnetic fields
+
+	double xdk = pos[0] * k[0] + pos[1] * k[1] + pos[2] * k[2]; // k.x for future calculations
+
+	double field_osc = cos(xdk - freq * t);// The field part responsible for oscilation
+
+ 	// Calculate the phase normalized to the length so that the function is 0 at phase = 0 and phase = L
+	double phase = (xdk - env_freq * t)/length;
+
+	double envelope = 0;
+
+	if (phase < 0|| phase > 1){
+		envelope = sin(phase) * sin(phase); // Calculate the value of the phase | Envelope function
+	}
+
+	for (int i = 0; i < 3; i++){
+		fields[i] = e_0[i] * field_osc * envelope;
+	}
+	for (int i = 3; i < 6; i++){
+		fields[i] = b_0[i] * field_osc * envelope;
+	}
+
+	return fields;
 }
