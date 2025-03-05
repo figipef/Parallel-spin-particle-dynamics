@@ -89,7 +89,7 @@ void Laser::set_B_0(double new_B[3]){
 }
 
 // Calculate the electric and magnetic field considering the envelope of the laser
-double* get_fields_envelope(double pos[3], double t){
+double* Laser::get_fields_envelope(double pos[3], double t){
 
 	if (env != 1){throw std::runtime_error("Envelope not initalized");}
 
@@ -105,7 +105,10 @@ double* get_fields_envelope(double pos[3], double t){
 	double envelope = 0;
 
 	if (phase < 0|| phase > 1){
+		// Change the sin * sin to other functions or to a different function that has to be defined by a character probably
 		envelope = sin(phase) * sin(phase); // Calculate the value of the phase | Envelope function
+	} else {
+		envelope = 0;
 	}
 
 	for (int i = 0; i < 3; i++){

@@ -2,6 +2,7 @@
 
 #include <cmath> 
 #include <algorithm>
+#include <iostream>
 
 class Laser
 {
@@ -35,5 +36,7 @@ public:
 	const double* get_B_0() const; // Return the original magnetic field (CONSTANT FIELD)
 
 	void set_B_0(double[3]);
+
+	double* get_fields_envelope(double[3], double); // Return an array with the Electric and Magnetic Fields (E,B) for the envelope defined
 
 };
