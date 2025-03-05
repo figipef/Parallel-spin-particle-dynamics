@@ -41,7 +41,7 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	return Om;
 }
 
-void boris(Particle*& particles, Laser* lasers, double time_step,  int n_of_lasers, int n_of_particles){
+void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_particles,  int n_of_lasers){
  	// NECESSÁRIO ADICIONAR TEMPO!!!! PARA DEPOIS CALCULAR OS CAMPOS DEPENDENTES DO TEMPO 
 
 	for (int i = 0; i < n_of_particles; ++i) {
@@ -53,9 +53,12 @@ void boris(Particle*& particles, Laser* lasers, double time_step,  int n_of_lase
 
 			// Cycle to add and get the s Electric and Magnetic Fields
 
+   			const double* laser_E = lasers[j].get_E_0();
+   			const double* laser_B = lasers[j].get_B_0();
+
 			for (int k = 0; k < 3; ++k) {
-				E_field[k] = lasers[j].get_E_0()[k];
-				B_field[k] = lasers[j].get_B_0()[k];
+				E_field[k] = E_field[k] + laser_E[k];
+				B_field[k] = B_field[k] + laser_B[k];
 			}
 		}
 
@@ -158,7 +161,6 @@ void createParticles(Particle* particles, int particle_number){
 	for (int i = 0; i < particle_number; ++i) {
 	    particles[i] = Particle(mom,pos,spin,i);  // Dynamically allocate objects
 	}
-
 }
 
 void PerformDiagnostics(std::vector<int>*& hist, Particle* particles,  \
@@ -360,4 +362,42 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
         	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
         }
     }
+}
+
+void writeToFile(std::ofstream& file, const Particle& p, char a){
+	const double* data = nullptr;
+
+	switch(a){
+
+		case 'p':
+
+			data = p.getPosition();
+			break;
+				
+		case 'm':
+			data = p.getMomentum();
+				
+			break;
+
+		case 's':
+
+			data = p.getSpin();
+			break;
+
+		default:
+	        file << "Invalid option" << std::endl;
+            break;
+		}
+
+	// Check for nullptr before accessing data
+	if (data) {
+
+	    for (int i = 0; i < 3; i++) {
+	        file << data[i] << " ";
+	    }
+	    file << std::endl;
+
+	} else {
+	    file << "Error: Null data pointer" << std::endl;
+	}	
 }

@@ -62,11 +62,11 @@ double* Laser::get_time_B(double t){
 
 } 
 
-double* Laser::get_E_0(){
+const double* Laser::get_E_0() const {
 	return e_0;
 } 
 
-double* Laser::get_B_0(){
+const double* Laser::get_B_0() const {
 	return b_0;
 } 
 

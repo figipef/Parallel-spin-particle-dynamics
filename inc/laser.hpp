@@ -26,8 +26,8 @@ public:
 	double* get_time_E(double); // Return the electric field independent of positon
 	double* get_time_B(double); // Return the magnetic field independent of positon
 
-	double* get_E_0(); // Return the original electric field (CONSTANT FIELD)
-	double* get_B_0(); // Return the original magnetic field (CONSTANT FIELD)
+	const double* get_E_0() const; // Return the original electric field (CONSTANT FIELD)
+	const double* get_B_0() const; // Return the original magnetic field (CONSTANT FIELD)
 
 	void set_B_0(double[3]);
 

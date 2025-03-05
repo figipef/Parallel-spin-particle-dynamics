@@ -22,3 +22,4 @@ void PerformDiagnostics(std::vector<int>*&, Particle*,  \
 	double , double , double , double , double , double );
 void PerformDiagnostics(std::vector<int>*&, Particle,std::string*, double*, double*, double*, int);
 void setupInputVariable(std::ifstream&, int&, double&, double&, std::string*&, double*&, double*&, double*&, double*&, int&);
+void writeToFile(std::ofstream&,  const Particle&, char);
