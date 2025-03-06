@@ -1,0 +1,18 @@
+INPUT VALUES
+NUMBER_OF_PARTICLES=  	2
+TIME_STEP=            	0.1 s
+TOTAL_TIME=  			10  s
+        DIAGNOSTICS
+PAR1=                   s1
+PAR2=                   p2
+PAR3=                   s2
+PAR4=			        s3		
+BIN_SIZE_1=             0.3
+BIN_SIZE_2=             0.12
+BIN_SIZE_3= 			0.2	
+BIN_MAX_1=              1
+BIN_MAX_2=              10
+BIN_MAX_3=              10   
+BIN_MIN_1=              -1 
+BIN_MIN_2=              -10
+BIN_MIN_3=				1
