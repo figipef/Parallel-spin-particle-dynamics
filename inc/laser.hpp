@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include <cmath> 
 #include <algorithm>
 #include <iostream>
@@ -15,16 +17,18 @@ private:
 	double env_freq; // frequency for the envelope
 	double length; // length of the envelope
 	int tag; // Tag for identification
-	int env;
+	int type;
 
 public:
 
 	// default constructor
 	Laser();
-	// constructor
+	// constructor with basica structure for an eletromagnetic field
 	Laser(double[3], double[3], int); // intensity vector (Eletric), wavevector, tag
+	// constructor with the option of b or k field and on/off frequency
+	Laser(double[3], double[3], int, char, char, double* _freq = nullptr); // intensity vector (Eletric), wavevector, tag (Para usar frequência, pôr &_freq)
 	// constructor for an envelope
-	Laser(double[3], double[3], int, double, double); // intensity vector (Eletric), wavevector, tag
+	Laser(double[3], double[3], int, double, double); // intensity vector (Eletric), wavevector, tag and envelope parameters
 	
 	double* get_E(double[3], double); // Return the true electric field at a point at a time
 	double* get_B(double[3], double); // Return the true magnetic field at a point at a time
@@ -39,4 +43,7 @@ public:
 
 	double* get_fields_envelope(double[3], double); // Return an array with the Electric and Magnetic Fields (E,B) for the envelope defined
 
+
+	// GENERAL GET FIELDS FUNCTION!!!!!!! Should be used to get the fields of a given laser
+	double* get_fields(double* t = nullptr, double pos[3] = nullptr, int* _type = nullptr); // Para usar o tempo, pôr &t!!!!
 };

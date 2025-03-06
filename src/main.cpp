@@ -1,5 +1,6 @@
 #include "particle.hpp"
 #include "functions.hpp"
+#include "laser.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -32,6 +33,8 @@ int main() {
     int n_par = 0;
     double* bin_n = new double[9];
 
+    Laser* lasers;
+
     // Setup the variables
     setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par);
     
@@ -49,7 +52,7 @@ int main() {
     createParticles(particles, particle_number);
 
     // Create the Laser array
-    Laser* lasers =  new Laser[1];
+    //Laser* lasers =  new Laser[1];
     double E_field[3] = {0,0,0};
     double k[3] = {1,0,0}; 
     lasers[0] = Laser(E_field,k,0);
