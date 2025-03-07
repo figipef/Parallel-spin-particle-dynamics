@@ -47,7 +47,7 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 			freq = *_freq;
 		} else if (!no_k){
 			freq = 1. * sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]); // calculate the frequency based on the wave vector c = 1
-		} else {"No k-vector or frequency given to calculate frequency";}
+		} else {throw std::runtime_error("No k-vector or frequency given to calculate frequency");}
 
 	}else if (_t_option == 'n' || _t_option == 'N'){
 
