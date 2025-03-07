@@ -1,5 +1,6 @@
 #include "particle.hpp"
 #include "functions.hpp"
+#include "laser.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -32,8 +33,10 @@ int main() {
     int n_par = 0;
     double* bin_n = new double[9];
 
+    Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
+    int laser_number;
     // Setup the variables
-    setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par);
+    setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par, lasers, laser_number);
     
     std::ofstream file_pos("output_position.txt");
     std::ofstream file_mom("output_momentum.txt");
@@ -49,12 +52,12 @@ int main() {
     createParticles(particles, particle_number);
 
     // Create the Laser array
-    Laser* lasers =  new Laser[1];
-    double E_field[3] = {0,0,0};
-    double k[3] = {1,0,0}; 
-    lasers[0] = Laser(E_field,k,0);
-    double B_field[3] = {0,0,1};
-    lasers[0].set_B_0(B_field);
+    //Laser* lasers =  new Laser[1];
+    //double E_field[3] = {0,0,0};
+    //double k[3] = {1,0,0}; 
+    //lasers[0] = Laser(E_field,k,0);
+    //double B_field[3] = {0,0,1};
+    //lasers[0].set_B_0(B_field);
 
     std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
 
@@ -82,7 +85,7 @@ int main() {
         }
         */
 
-        boris(particles,lasers, time_step, particle_number, 1);
+        boris(particles,lasers, time_step, particle_number, laser_number);
 
         writeToFile(file_pos, particles[0], 'p');
         writeToFile(file_mom, particles[0], 'm');
@@ -96,6 +99,19 @@ int main() {
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
+
+    // Lasers health
+    std::cout << "---Lasers--- \n";
+    for (int i = 0; i < laser_number; i++){
+        std::cout <<"Laser number = " << i <<std::endl;
+        std::cout << "Tag = " << lasers[i].tag << "\n";
+        std::cout << "Type = " << lasers[i].type << "\n";
+        std::cout << "Freq = " << lasers[i].freq << "\n";
+        std::cout << "env_freq = " << lasers[i].env_freq << "\n";
+        std::cout << "length = " << lasers[i].length << "\n";
+        std::cout << "E = [ " <<lasers[i].get_E_0()[0]<<", "<<lasers[i].get_E_0()[1]<<", "<<lasers[i].get_E_0()[2]<< " ]\n";
+        std::cout << "B = [ " <<lasers[i].get_B_0()[0]<<", "<<lasers[i].get_B_0()[1]<<", "<<lasers[i].get_B_0()[2]<< " ]\n";
+    }
 
     particles[0].display_position();
     particles[0].display_momentum();

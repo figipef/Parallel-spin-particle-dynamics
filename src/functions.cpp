@@ -264,7 +264,8 @@ void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
 	}
 }
 
-void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, std::string*& params, double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par){
+void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, std::string*& params,
+	 double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -297,6 +298,8 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     int nbs = 1;
     int bM = 1;
     int bm = 1;
+
+    int l_index = 1; // Laser index / amount - 1 
 
     auto it = values.begin(); // Iterator for the map
 
@@ -334,7 +337,6 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     		binmax[bM - 1] =std::stod(it->second); // Save it to the array
     		bM += 1; // Counter update
     		it = values.begin(); // Restart Iterator
-
     	}
 
     	if ("BIN_MIN_"+std::to_string(bm) == it->first && !it->second.empty()){
@@ -342,10 +344,110 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     		binmin[bm - 1] =std::stod(it->second); // Save it to the array
     		bm += 1; // Counter update
     		it = values.begin(); // Restart Iterator
-
     	}
+
+    	// Laser creation stuff
+    	if ("L"+std::to_string(l_index) == it->first && !it->second.empty()){ 
+
+    		int type = std::stoi(it->second);
+
+    		// Check for initial eletric field 
+    		if (values["E" + std::to_string(l_index)].empty()) {throw std::runtime_error("No Electric field initalized! INITALIZE IT :) ");}
+
+    		if (type == 0){
+
+    			if (!values["K" + std::to_string(l_index)].empty() && values["B" + std::to_string(l_index)].empty()){
+    				std::cout << l_index<<"\n";
+    				double temp_E[3] = {0}, temp_k[3] = {0};
+
+    				// Parse the input file text to vectors for Eletric and Wave vector
+    				parseVector(values["E" + std::to_string(l_index)], temp_E);
+    				parseVector(values["K" + std::to_string(l_index)], temp_k);
+
+    				lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, 'k', 'n');
+
+    			} else if (values["K" + std::to_string(l_index)].empty() && !values["B" + std::to_string(l_index)].empty()){
+
+    				double temp_E[3] = {0}, temp_B[3] = {0};
+
+    				// Parse the input file text to vectors for Eletric and Wave vector
+    				parseVector(values["E" + std::to_string(l_index)], temp_E);
+    				parseVector(values["B" + std::to_string(l_index)], temp_B);
+
+    				lasers[l_index - 1] = Laser(temp_E, temp_B, -l_index, 'b', 'n');
+
+    			} else {throw std::runtime_error("Initalized both K and B for a constant field (type 0)");}
+
+    		}else if (type == 1){
+
+    			if (!values["K" + std::to_string(l_index)].empty() && values["B" + std::to_string(l_index)].empty()){
+
+    				double temp_E[3] = {0}, temp_k[3] = {0};
+
+    				// Parse the input file text to vectors for Eletric and Wave vector
+    				parseVector(values["E" + std::to_string(l_index)], temp_E);
+    				parseVector(values["K" + std::to_string(l_index)], temp_k);
+
+    				lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, 'k', 'y');
+
+    			} else if (values["K" + std::to_string(l_index)].empty() && !values["B" + std::to_string(l_index)].empty()){
+
+    				if (values["FREQ" + std::to_string(l_index)].empty()){
+    					throw std::runtime_error("No frequency initalized for a B field time dependent field (type 1)");}
+
+    				double temp_E[3] = {0}, temp_B[3] = {0};
+    				double freq = std::stod(values["FREQ" + std::to_string(l_index)]);
+    				// Parse the input file text to vectors for Eletric and Wave vector
+    				parseVector(values["E" + std::to_string(l_index)], temp_E);
+    				parseVector(values["B" + std::to_string(l_index)], temp_B);
+
+    				lasers[l_index - 1] = Laser(temp_E, temp_B, -l_index, 'b', 'y', &freq);
+
+    			} else {throw std::runtime_error("Initalized both K and B for a constant field (type 1) (or both are empty)");}
+
+    		}else if (type == 2){
+
+    			if (values["K" + std::to_string(l_index)].empty()){throw std::runtime_error("No wave vector (k), defined for a continuous laser (type 2)");}
+
+    			double temp_E[3] = {0}, temp_k[3] = {0};
+
+    			// Parse the input file text to vectors for Eletric and Wave vector
+    			parseVector(values["E" + std::to_string(l_index)], temp_E);
+    			parseVector(values["K" + std::to_string(l_index)], temp_k);
+
+    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index);
+
+    		}else if (type == 3){
+
+    			if (values["K" + std::to_string(l_index)].empty()){
+    				throw std::runtime_error("No wave vector (k) defined for a packet laser (type 3)");}
+
+    			if (values["ENV_FREQ" + std::to_string(l_index)].empty()){
+    				throw std::runtime_error("No envelope frequency defined for a packet laser (type 3)");}
+    				
+    			if (values["ENV_L" + std::to_string(l_index)].empty()){
+    				throw std::runtime_error("No envelope length defined for a packet laser (type 3)");}	
+
+    			double env_l = std::stod(values["ENV_L" + std::to_string(l_index)]);
+    			double env_freq = std::stod(values["ENV_FREQ" + std::to_string(l_index)]);
+
+    			double temp_E[3] = {0}, temp_k[3] = {0};
+
+    			// Parse the input file text to vectors for Eletric and Wave vector
+    			parseVector(values["E" + std::to_string(l_index)], temp_E);
+    			parseVector(values["K" + std::to_string(l_index)], temp_k);
+
+    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, env_l, env_freq);
+
+    		} else {throw std::runtime_error("Invalid Laser type");}
+
+    		l_index++;
+    	}
+
     	it ++;
     }
+
+    laser_number = l_index - 1;
 
     // Check if the number of variables is the same for every bin parameter and parameters
     if (n_par != bm || n_par != bM || n_par != nbs){
@@ -400,4 +502,11 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 	} else {
 	    file << "Error: Null data pointer" << std::endl;
 	}	
+}
+
+// Helper function to help parse vectors
+void parseVector(const std::string& value, double vec[3]) {
+    std::istringstream ss(value);
+    char comma; // To skip the commas
+    ss >> vec[0] >> comma >> vec[1] >> comma >> vec[2];
 }
