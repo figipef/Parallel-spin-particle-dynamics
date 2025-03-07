@@ -7,10 +7,6 @@ double CHARGE = 1;
 double G = 1;
 double a = 0.00116; //anomalous magetic moment
 
-int test(int a){
-	return a + 123;
-}
-
 // Calculate the cross product of two vectors
 double* cross(double a[3], double b[3]) {
 	double* c = new double[3];
@@ -41,13 +37,18 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	return Om;
 }
 
-void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_particles,  int n_of_lasers){
- 	// NECESSÁRIO ADICIONAR TEMPO!!!! PARA DEPOIS CALCULAR OS CAMPOS DEPENDENTES DO TEMPO 
+void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles,  int n_of_lasers){
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
 		double E_field[3] = {0,0,0};
 		double B_field[3] = {0,0,0};
+
+		Particle& p = particles[i];
+
+		const double* p_position = p.getPosition();
+		const double* p_momentum = p.getMomentum();
+		//const double* p_spin = p.getSpin();
 
 		for (int j = 0; j < n_of_lasers; ++j){
 
@@ -56,18 +57,18 @@ void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_parti
    			const double* laser_E = lasers[j].get_E_0();
    			const double* laser_B = lasers[j].get_B_0();
 
+   			double* fields = lasers[j].get_fields(&time, p_position); // These might not be used
+
 			for (int k = 0; k < 3; ++k) {
-				E_field[k] = E_field[k] + laser_E[k];
-				B_field[k] = B_field[k] + laser_B[k];
+				E_field[k] = E_field[k] + fields[k];
+				B_field[k] = B_field[k] + fields[k+3];
 			}
 		}
-
-		Particle& p = particles[i];
 
 		// 1st E half-step
 		double u_minus[3];
 		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p.getMomentum()[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
+			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
 		}
 
         // auxiliary vector t
@@ -116,7 +117,7 @@ void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_parti
 
 		double new_pos[3];
 		for (int j= 0; j <3; j++){
-			new_pos[j] = particles[i].getPosition()[j] + time_step * new_v[j]; 
+			new_pos[j] = p_position[j] + time_step * new_v[j]; 
 		}
 
 		particles[i].setPosition(new_pos);
@@ -153,6 +154,7 @@ void boris(Particle*& particles, Laser* lasers, double time_step, int n_of_parti
     }
 }
 
+// Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
 	double pos[3] = {1,0,0};
 	double mom[3] = {1,0,0};
@@ -163,87 +165,18 @@ void createParticles(Particle* particles, int particle_number){
 	}
 }
 
-void PerformDiagnostics(std::vector<int>*& hist, Particle* particles,  \
-	int particle_number, std::string par1, std::string par2, std::string par3, double b1_size, double b2_size, double b3_size, \
-	double b1_max, double b2_max, double b3_max, double b1_min, double b2_min, double b3_min){
-
-	// Initialize the arrays for relevant quantities
-	char *p = new char[3];
-	int *i = new int[3];
-	double *bmax = new double[3];
-	double *bmin = new double[3];
-	double *bsize = new double[3];
-
-	int n_of_pars = 0;
-
-	// Check if the parameters have values and stores the number of parameters needed
-	if (!par1.empty()){
-		n_of_pars += 1;
-
-		p[0] = par1[0];
-		i[0] = par1[1];
-		bmax[0] = b1_max;
-		bmin[0] = b1_min;
-		bsize[0] = b1_size;
-	}
-
-	if (!par2.empty()){
-		n_of_pars += 1;
-
-		p[1] = par2[0];
-		i[1] = par2[1];
-		bmax[1] = b2_max;
-		bmin[1] = b2_min;
-		bsize[1] = b2_size;
-
-	}
-
-	if (!par3.empty()){
-		n_of_pars += 1;
-
-		p[2] = par3[0];
-		i[2] = par3[1];
-		bmax[2] = b3_max;
-		bmin[2] = b3_min;
-		bsize[2] = b3_size;
-	}
-
-	// Perform the cycle to save the data to an unordered array with the counting bins
-	for (int j = 0; j < particle_number; j++){
-		for (int k = 0; k < n_of_pars; k++){
-			double value;
-			switch(p[k]){
-				case 'p':
-					value = particles[j].getPosition()[i[k]];
-					break;
-				case 'm':
-					value = particles[j].getMomentum()[i[k]];
-					break;
-				case 's':
-					value = particles[j].getSpin()[i[k]];
-					break;
-			}
-
-			if (value < bmin[k] || value > bmax[k]) break;  // Ignore out-of-range values
-
-    		int index = (value - bmin[k]) / bsize[k];  // Compute bin index
-    		hist[k][index]++;  // Increment corresponding bin
-		}
-	}
-}
-
+// Creates a histogram based on the Diagnostics specified before
 void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
 	std::string* params, double* bsize, double* bmax, double* bmin, int n_of_pars){
 
 	if (n_of_pars == 0){
-		
         throw std::runtime_error("Not Enough Parameters to perform Diagnostics!");
     } 
 
 	// Perform the cycle to save the data to an unordered array with the counting bins
 	
 	for (int k = 0; k < n_of_pars; k++){
-		double value;
+		double value = 0;
 		int i = params[k][1] - '0'; // Get the particle index from the parameter character
 		switch(params[k][0]){
 			case 'p':
@@ -255,15 +188,16 @@ void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
 			case 's':
 				value = particle.getSpin()[i - 1];
 				break;
-		}
+		} 
 
 		if (value < bmin[k] || value > bmax[k]) break;  // Ignore out-of-range values
 
-    	int index = (value - bmin[k]) / bsize[k];  // Compute bin index
+    	int index = std::round((value - bmin[k]) / bsize[k]);  // Compute bin index
     	hist[k][index]++;  // Increment corresponding bin
 	}
 }
 
+// Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
 
@@ -466,6 +400,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     }
 }
 
+// Writes the wanted values of a given particle to a file
 void writeToFile(std::ofstream& file, const Particle& p, char a){
 	const double* data = nullptr;
 
@@ -477,8 +412,8 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 			break;
 				
 		case 'm':
+
 			data = p.getMomentum();
-				
 			break;
 
 		case 's':

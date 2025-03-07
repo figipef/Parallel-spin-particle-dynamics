@@ -163,7 +163,7 @@ double* Laser::get_fields_envelope(double pos[3], double t){
 	return fields;
 }
 
-double* Laser::get_fields(double* t, double pos[3], int* _type){
+double* Laser::get_fields(double* t, const double pos[3], int* _type){
 
 	if (_type){
 		type = *_type;
