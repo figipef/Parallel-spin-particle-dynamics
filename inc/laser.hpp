@@ -20,8 +20,6 @@ public:
 	int tag; // Tag for identification
 	int type;
 
-
-
 	// default constructor
 	Laser();
 	// constructor with basica structure for an eletromagnetic field
@@ -45,5 +43,5 @@ public:
 	double* get_fields_envelope(double[3], double); // Return an array with the Electric and Magnetic Fields (E,B) for the envelope defined
 
 	// GENERAL GET FIELDS FUNCTION!!!!!!! Should be used to get the fields of a given laser
-	double* get_fields(double* t = nullptr, double pos[3] = nullptr, int* _type = nullptr); // Para usar o tempo, pôr &t!!!!
+	double* get_fields(double* t = nullptr, const double pos[3] = nullptr, int* _type = nullptr); // Para usar o tempo, pôr &t!!!!
 };

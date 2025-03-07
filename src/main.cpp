@@ -85,7 +85,7 @@ int main() {
         }
         */
 
-        boris(particles,lasers, time_step, particle_number, laser_number);
+        boris(particles,lasers, t, time_step, particle_number, laser_number);
 
         writeToFile(file_pos, particles[0], 'p');
         writeToFile(file_mom, particles[0], 'm');
@@ -113,6 +113,18 @@ int main() {
         std::cout << "B = [ " <<lasers[i].get_B_0()[0]<<", "<<lasers[i].get_B_0()[1]<<", "<<lasers[i].get_B_0()[2]<< " ]\n";
     }
 
+    std::cout << "----Testing----\n";
+    double t = 1.32;
+    int tipo = 3;
+    double pos[3] = {1,1,-1};
+
+    for (int i = 0; i<6;i++){
+        
+        std::cout << " Component "<<i<<" : "<< lasers[0].get_fields(&t, pos)[i]<<"\n";
+    }
+
+    std::cout <<"Resultado: "<<cos(pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 1.41421) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5)<<"\n";
+    std::cout << "---------\n\n";
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();
