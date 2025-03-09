@@ -10,19 +10,18 @@ def read_output(file_name): #takes in a string with output file name and outputs
 
 def read_input(file_name): #takes in string with input file name and outputs dictionary with input parameters (will need to be updated consistently to include more parameters)
     dic = {}
-    i = 1
     with open(file_name, "r") as file:
         for line in file:
-            if ("INPUT" not in line) and ("DIAGNOSTICS" not in line):
+            content = line.strip().split()
+            if "=" in line and len(content) > 1: 
                 if "NUMBER" in line:
-                    content = line.strip().split()
                     dic[content[0][:-1]] = int(content[1])
                 else:
                     if "PAR" in line:
-                        content = line.strip().split()
                         dic[content[0][:-1]] = content[1]
                     else:
-                        content = line.strip().split()
-                        dic[content[0][:-1]] = float(content[1])
-            i += 1
+                        if "E1=" in line or "B1=" in line:
+                            dic[content[0][:-1]] = [float(val) for val in content[1].split(",")]
+                        else:
+                            dic[content[0][:-1]] = float(content[1])
     return dic

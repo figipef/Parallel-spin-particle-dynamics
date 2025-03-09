@@ -4,7 +4,7 @@
 
 double MASS = 1; 
 double CHARGE = 1;
-double G = 1;
+double G = 1; // hum whats this one?
 double a = 0.00116; //anomalous magetic moment
 
 // Calculate the cross product of two vectors
