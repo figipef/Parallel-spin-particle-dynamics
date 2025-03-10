@@ -62,7 +62,7 @@ def hist_Phase_Space(q, bins=10, Title="", xlabel="Values", ylabel="Frequency", 
     plt.hist(q, bins=bins, density=density, edgecolor='black')
     plt.xlabel(xlabel, fontsize=16)
     plt.ylabel(ylabel, fontsize=16)
-    plt.title(title, fontsize=18)
+    plt.title(Title, fontsize=18)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     if grid:
