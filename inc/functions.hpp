@@ -16,6 +16,7 @@ double gamma(double[3]); // Calculates the gamma for a vector
 void boris(Particle*&, Laser*, double, double,  int, int); // Simple boris pusher
 void createParticles(Particle*, int); // Creates particles
 void PerformDiagnostics(std::vector<int>*&, Particle,std::string*, double*, double*, double*, int);
-void setupInputVariable(std::ifstream&, int&, double&, double&, std::string*&, double*&, double*&, double*&, double*&, int&, Laser*&, int&);
+void setupInputVariable(std::ifstream&, int&, double&, double&, int&, std::string*&, double*&, double*&, double*&, double*&, int&, Laser*&, int&);
 void writeToFile(std::ofstream&,  const Particle&, char);
+void writeDiagnosticsToFile(std::vector<std::ofstream>&, const std::vector<int>*, const double);
 void parseVector(const std::string&, double[3]);

@@ -198,7 +198,7 @@ void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
 }
 
 // Setups the variables for the simulation and diagnostics
-void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, std::string*& params,
+void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
 
 	/*
@@ -225,6 +225,8 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     particle_n = std::stoi(values["NUMBER_OF_PARTICLES"]);
     timestep = std::stod(values["TIME_STEP"]);
     totaltime = std::stod(values["TOTAL_TIME"]);
+
+    step_diag = std::stoi(values["STEPS_DIAG"]);
 
     // Initalize counters for the bin parameters
 
@@ -437,6 +439,29 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 	} else {
 	    file << "Error: Null data pointer" << std::endl;
 	}	
+}
+
+void writeDiagnosticsToFile(std::vector<std::ofstream>& diag_files, const std::vector<int>* histograms, const double t){
+
+	int counter = 0;
+
+	for (std::ofstream& file: diag_files){
+
+		if (!file) {
+            std::cerr << "Error: File stream is not open.\n";
+            continue;
+        }
+
+		file << t <<" "; // Save time at witch the measure was made
+
+		for (int value: histograms[counter]){
+			file << value << " ";
+		}
+
+		file << "\n";
+
+		counter ++;
+	}
 }
 
 // Helper function to help parse vectors

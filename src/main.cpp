@@ -25,6 +25,8 @@ int main() {
     double time_step;
     double total_time;
 
+    int step_diag;
+
     // Initalize the variables for the Diagnostic
     std::string *params = new std::string[9];
     double *binsize = new double[9];
@@ -36,11 +38,21 @@ int main() {
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
     int laser_number;
     // Setup the variables
-    setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, lasers, laser_number);
     
-    std::ofstream file_pos("output_position.txt");
-    std::ofstream file_mom("output_momentum.txt");
-    std::ofstream file_spn("output_spin.txt");
+    std::ofstream file_pos("../output/position.txt");
+    std::ofstream file_mom("../output/momentum.txt");
+    std::ofstream file_spn("../output/spin.txt");
+
+    std::vector<std::ofstream> diag_files;
+    diag_files.reserve(n_par);
+
+    for (int i = 0; i < n_par; i++){
+        std::ofstream file_diag("../output/diagnostics" + std::to_string(i+1) + ".txt"); // Create the diagnostic files
+        file_diag << "OUTPUT FILE FOR PARAMETER " << params[i] <<std::endl;  
+        diag_files.emplace_back(std::move(file_diag));
+    }
+
 
     // ============================
     //   START OF MAIN CODE BLOCK
@@ -67,25 +79,25 @@ int main() {
     particles[0].display_momentum();
     particles[0].display_spin();
 
+    int counter = 0;
     for (double t = 0; t <= total_time; t += time_step){
-        /*
-        std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
-
-        for (int i = 0; i < n_par; i++){
-            std::cout <<"a  "<<bin_n[i]<<std::endl;
-            histograms[i] = std::vector<int>(bin_n[i], 0); // Create the histograms necessary
-        }
         
-        // Testing the Diagnostics
-
-        PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par); // use in the boris pusher
-
-        for (int value : histograms[0]) {
-            std::cout << value << " ";
-        }
-        */
-
         boris(particles,lasers, t, time_step, particle_number, laser_number);
+
+        if (counter == step_diag && step_diag >= 1 && n_par > 0){
+
+            std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
+
+            for (int i = 0; i < n_par; i++){
+                histograms[i] = std::vector<int>(bin_n[i], 0); // Create the histograms necessary
+            }
+
+            PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par); // use in the boris pusher
+
+            writeDiagnosticsToFile(diag_files, histograms, t);
+
+            counter = 0;
+        }
 
         writeToFile(file_pos, particles[0], 'p');
         writeToFile(file_mom, particles[0], 'm');
@@ -94,6 +106,7 @@ int main() {
         //particles[0].display_position();
         //particles[0].display_momentum();
         //particles[0].display_spin();
+        counter++;
     }
 
 	// ===========================
