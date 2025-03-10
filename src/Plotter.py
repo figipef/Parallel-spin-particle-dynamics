@@ -55,3 +55,16 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
     #done
 
 #Depois tambem haveremos de precisar de histogramas para espaço de fases
+
+def hist_Phase_Space(q, bins=10, Title="", xlabel="Values", ylabel="Frequency", grid=True, density=False):
+
+    plt.figure(figsize=(8, 5))
+    plt.hist(q, bins=bins, density=density, edgecolor='black')
+    plt.xlabel(xlabel, fontsize=16)
+    plt.ylabel(ylabel, fontsize=16)
+    plt.title(title, fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    if grid:
+        plt.grid(True)
+    plt.show()
