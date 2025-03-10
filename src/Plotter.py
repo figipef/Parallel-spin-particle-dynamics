@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
 def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
     n = len(q)
@@ -56,15 +58,56 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
 
 #Depois tambem haveremos de precisar de histogramas para espaço de fases
 
-def hist_Phase_Space(q, bins=10, Title="", xlabel="Values", ylabel="Frequency", grid=True, density=False):
+def plot_hists(Q, bins=10, Title="", xlabel="Values", ylabel="Frequency", grid=True, density=False, labels=None, alpha=0.5):
 
+    if labels is None or len(labels) != len(Q):
+        labels = [f"Dataset {i+1}" for i in range(len(Q))]
+    
     plt.figure(figsize=(8, 5))
-    plt.hist(q, bins=bins, density=density, edgecolor='black')
+
+    plt.hist(Q, bins=bins, density=density, alpha=alpha, label=labels, edgecolor='black')
+    
     plt.xlabel(xlabel, fontsize=16)
     plt.ylabel(ylabel, fontsize=16)
     plt.title(Title, fontsize=18)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
+    
     if grid:
         plt.grid(True)
+    
+    plt.legend(fontsize=15)
+    plt.show()
+
+def plot_hists_seaborn(Q, bins=10, title="", xlabel="Values", ylabel="Frequency", grid=True, density=False, labels=None, alpha=0.5):
+    
+    if labels is None or len(labels) != len(Q):
+        labels = [f"Dataset {i+1}" for i in range(len(Q))]
+    
+    # Create a combined DataFrame from all data arrays
+    df_list = []
+    for i, data in enumerate(Q):
+        temp_df = pd.DataFrame({'Value': data})
+        temp_df['Dataset'] = labels[i]
+        df_list.append(temp_df)
+    df = pd.concat(df_list, ignore_index=True)
+    
+    plt.figure(figsize=(8, 5))
+    
+    # Use 'density' or 'count' based on the density flag
+    stat_val = 'density' if density else 'count'
+    
+    sns.histplot(data=df, x='Value', hue='Dataset', bins=bins, stat=stat_val,
+                 multiple="layer", alpha=alpha)
+    
+    plt.xlabel(xlabel, fontsize=16)
+    plt.ylabel(ylabel, fontsize=16)
+    plt.title(title, fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    
+    if grid:
+        plt.grid(True)
+    
+    plt.legend(fontsize=15)
     plt.show()
