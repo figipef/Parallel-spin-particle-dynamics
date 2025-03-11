@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <mpi.h>
+
 int main() {
 
     // ============================

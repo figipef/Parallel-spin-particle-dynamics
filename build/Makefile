@@ -1,7 +1,3 @@
-# Compiler
-CXX := g++
-CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2
-
 # Directories
 ROOTDIR := ..
 BUILDDIR := $(ROOTDIR)/build
@@ -10,42 +6,52 @@ BINDIR := $(ROOTDIR)/build
 INCDIR := $(ROOTDIR)/inc
 OBJDIR := $(BUILDDIR)/obj
 
-# Files
-SOURCES := $(wildcard $(SRCDIR)/*.cpp) #$(wildcard $(INCDIR)\chi2/*.cpp)
-OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
+# Compiler
+CXX := g++
+MPICXX := mpic++
 
-$(info $(SRCDIR))
+# Compiler flags
+CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2 -I$(INCDIR)
+
+# Files
+SOURCES := $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 
 # Program name
 PROGRAM_NAME := test
-ifdef NAME
-	PROGRAM_NAME := $(NAME)
-endif
+#ifdef NAME
+#	PROGRAM_NAME := $(NAME)
+#endif
 
 # Target binary
 TARGET := $(BINDIR)/$(PROGRAM_NAME)
+MPI_TARGET := $(BINDIR)/$(PROGRAM_NAME)_mpi
 
 # Default target
 all: $(TARGET)
+
+# MPI target
+mpi: CXX := $(MPICXX)
+mpi: $(MPI_TARGET)
 
 # Linking
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
+$(MPI_TARGET): $(OBJECTS)
+	$(MPICXX) $(CXXFLAGS) $^ -o $@
+
 # Compilation
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(OBJDIR)/%.o: $(INCDIR)/chi2/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Create build directory
 $(OBJDIR):
-	mkdir obj
+	mkdir -p $(OBJDIR)
 
 # Clean
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET) $(MPI_TARGET)
 
 # Phony targets
-.PHONY: all clean
+.PHONY: all clean mpi
