@@ -106,9 +106,6 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
 #num primeiro aproach precisamos de plots tipo quantidade vs tempo assumindo que recebe a lista de outputs e o dicionario de input do reader
     #done
 
-<<<<<<< HEAD
-#Depois tambem haveremos de precisar de histogramas para espaço de fases
-=======
 #Depois tambem haveremos de precisar de histogramas para espaço de fases
 
 def plot_hists(Q, bins=10, Title="", xlabel="Values", ylabel="Frequency", grid=True, density=False, labels=None, alpha=0.5):
@@ -164,4 +161,4 @@ def plot_hists_seaborn(Q, bins=10, title="", xlabel="Values", ylabel="Frequency"
     
     plt.legend(fontsize=15)
     plt.show()
->>>>>>> 7d5d492f5ea716a8ed5746cfdf0555b58fe4b3f9
+
