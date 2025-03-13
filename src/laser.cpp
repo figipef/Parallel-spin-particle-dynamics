@@ -59,6 +59,8 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 
 Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq) : tag(_tag), length(_length), env_freq(_env_freq){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
+	
+	std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
 	std::copy(_k, _k+3, k); // copy the wave vector _k to k
 
 	b_0[0] = (k[1]*e_0[2] - k[2]*e_0[1])/1.; // calculate the cross product the  must be divided by c=1
@@ -216,15 +218,15 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 		double* fields = new double[6]; // E[3] x B[3] an array with the eletric and magnetic fields
 
 		double xdk = pos[0] * k[0] + pos[1] * k[1] + pos[2] * k[2]; // k.x for future calculations
-
+		//std::cout <<"xdk = "<< (xdk - freq * (*t)) / (length * M_PI)<<"\n";
 		double field_osc = cos(xdk - freq * (*t));// The field part responsible for oscilation
 
  		// Calculate the phase normalized to the length so that the function is 0 at phase = 0 and phase = L
-		double phase = (xdk - env_freq * (*t))/length;
-
+		double phase = (xdk/sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]) - 1 * (*t))* M_PI / length ;
+		//std::cout <<" phase: "<< phase <<"\n";
 		double envelope = 0;
 
-		if (phase < 0|| phase > M_PI){
+		if (phase > 0 && phase < M_PI){
 			// Change the sin * sin to other functions or to a different function that has to be defined by a character probably
 			envelope = sin(phase) * sin(phase); // Calculate the value of the phase | Envelope function
 		} else {
@@ -234,7 +236,6 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 		for (int i = 0; i < 3; i++) fields[i] = e_0[i] * field_osc * envelope;
 		
 		for (int i = 3; i < 6; i++) fields[i] = b_0[i - 3] * field_osc * envelope;
-
 
 		return fields;
 

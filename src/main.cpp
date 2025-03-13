@@ -79,6 +79,8 @@ int main() {
     particles[0].display_momentum();
     particles[0].display_spin();
 
+    std::ofstream file_electric_y("../output/e_field.txt");
+
     int counter = 0;
     for (double t = 0; t <= total_time; t += time_step){
         
@@ -98,6 +100,15 @@ int main() {
 
             counter = 0;
         }
+        
+        for (double x =0; x <=20;x = x + 1){
+            double pos[3] = {x,0,0};
+            //std::cout << lasers[0].get_fields(pos, &t)[1] <<" ";
+            file_electric_y << lasers[0].get_fields(&t,pos)[1] <<" ";
+        }
+        //std::cout <<"\n";
+        file_electric_y << "\n";
+        
 
         writeToFile(file_pos, particles[0], 'p');
         writeToFile(file_mom, particles[0], 'm');

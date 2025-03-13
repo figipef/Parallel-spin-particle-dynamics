@@ -20,7 +20,7 @@ def read_input(file_name): #takes in string with input file name and outputs dic
                     if "PAR" in line:
                         dic[content[0][:-1]] = content[1]
                     else:
-                        if "E1=" in line or "B1=" in line:
+                        if "E1=" in line or "B1=" in line or ',' in line:
                             dic[content[0][:-1]] = [float(val) for val in content[1].split(",")]
                         else:
                             dic[content[0][:-1]] = float(content[1])

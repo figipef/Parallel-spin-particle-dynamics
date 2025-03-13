@@ -54,14 +54,19 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 			// Cycle to add and get the s Electric and Magnetic Fields
 
-   			const double* laser_E = lasers[j].get_E_0();
-   			const double* laser_B = lasers[j].get_B_0();
+   			//const double* laser_E = lasers[j].get_E_0();
+   			//const double* laser_B = lasers[j].get_B_0();
 
    			double* fields = lasers[j].get_fields(&time, p_position); // These might not be used
+   			//std::cout << "Pos: "<<p_position[0]<<" "<<p_position[1]<<" "<<p_position[2]<<"\n";
 
 			for (int k = 0; k < 3; ++k) {
 				E_field[k] = E_field[k] + fields[k];
 				B_field[k] = B_field[k] + fields[k+3];
+				//std::cout << "E " << E_field[k] << " B "<< B_field[k] <<"\n";
+			}
+			if (E_field[1] !=0){
+				std::cout << "HIT!!! "<< time <<"\n";
 			}
 		}
 
@@ -156,8 +161,8 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 // Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {1,0,0};
-	double mom[3] = {1,0,0};
+	double pos[3] = {25,0,0};
+	double mom[3] = {0,0,0};
     double spin[3] = {-1,0,1};
 
 	for (int i = 0; i < particle_number; ++i) {
@@ -293,7 +298,6 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     		if (type == 0){
 
     			if (!values["K" + std::to_string(l_index)].empty() && values["B" + std::to_string(l_index)].empty()){
-    				std::cout << l_index<<"\n";
     				double temp_E[3] = {0}, temp_k[3] = {0};
 
     				// Parse the input file text to vectors for Eletric and Wave vector

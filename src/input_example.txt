@@ -17,10 +17,10 @@ BIN_MIN_1=              -1
 BIN_MIN_2=              -10
 BIN_MIN_3=				1
 		   LASERS
-L1=						0
-K1=						
-E1=						0,0,0
-B1=						0,0,1
+L1=						3
+K1=						0,1,0
+E1=						1,0,0
+B1=						
 FREQ1= 					0
-ENV_FREQ1=				0
-ENV_L1=                 0
+ENV_FREQ1=				1
+ENV_L1=                 1000
