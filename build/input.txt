@@ -6,8 +6,8 @@ STEPS_DIAG=             10
          DIAGNOSTICS
 PAR1=                   p1
 PAR2=                   p2					
-BIN_SIZE_1=             0.2
-BIN_SIZE_2=             0.2 				
+BIN_NUMBER_1=           11
+BIN_NUMBER_2=           11 				
 BIN_MAX_1=              1
 BIN_MAX_2=              1                
 BIN_MIN_1=              -1 

@@ -238,7 +238,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 		// If the histogram is passed, perform the Diagnostics
 		if(hist != nullptr && diag_params != nullptr){
-
+			std::cout <<"a\n";
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
@@ -320,9 +320,14 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     		it = values.begin(); // Restart Iterator
     	}
 
-    	if ("BIN_SIZE_"+std::to_string(nbs) == it->first && !it->second.empty()){
+    	if ("BIN_NUMBER_"+std::to_string(nbs) == it->first && !it->second.empty()){
 
-    		binsize[nbs - 1] =std::stod(it->second);// Save it to the array
+    		bin_n[nbs - 1] =std::stoi(it->second);// Save it to the array
+
+    		if (bin_n[nbs - 1] < 1){ // Check to see if the number of bins is valid
+    			throw std::runtime_error("Invalid Number of Bins <1 ");
+    		}
+
     		nbs += 1;// Counter update
     		it = values.begin();// Restart Iterator
     	}
@@ -441,7 +446,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     	it ++;
     }
 
-    laser_number = l_index - 1;
+    laser_number = l_index - 1; 
 
     // Check if the number of variables is the same for every bin parameter and parameters
     if (n_par != bm || n_par != bM || n_par != nbs){
@@ -456,9 +461,11 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
 
     for (int i = 0; i < n_par; i++){
 
-        bin_n[i] = std::round((binmax[i] - binmin[i]) / binsize[i] + 1); // Calculate the size of the histogram
+    	binsize[i] = (binmax[i] - binmin[i]) / (bin_n[i] - 1 + 1e-308); // calculate the size of each bin
 
-        if (bin_n[i] < 1){
+        //bin_n[i] = std::round((binmax[i] - binmin[i]) / binsize[i] + 1); // Calculate the size of the histogram
+    	std::cout << binsize[i];
+        if (binsize[i] < 0){
         	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
         }
     }

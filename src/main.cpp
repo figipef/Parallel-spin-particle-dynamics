@@ -75,7 +75,7 @@ int main() {
             Histogram hist = createHistogram(n_par, bin_n);
 
             boris(particles,lasers, t, time_step, particle_number, laser_number, &hist, &diag_params);
-
+            
             writeDiagnosticsToFile(hist, counter, t);
 
         } else { // Normal Boris run
