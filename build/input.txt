@@ -1,26 +1,21 @@
 INPUT VALUES
-NUMBER_OF_PARTICLES=  	1
+NUMBER_OF_PARTICLES=  	10
 TIME_STEP=            	0.1 s
-TOTAL_TIME=  			200  s
+TOTAL_TIME=  			10  s
 STEPS_DIAG=             10
          DIAGNOSTICS
-PAR1=                   m1
-PAR2=                   m2
-PAR3=                   m3
-PAR4=					
+PAR1=                   p1
+PAR2=                   p2					
 BIN_SIZE_1=             0.2
-BIN_SIZE_2=             0.2
-BIN_SIZE_3= 			0.2	
+BIN_SIZE_2=             0.2 				
 BIN_MAX_1=              1
-BIN_MAX_2=              1
-BIN_MAX_3=              1   
+BIN_MAX_2=              1                
 BIN_MIN_1=              -1 
 BIN_MIN_2=              -1
-BIN_MIN_3=				-1
 		   LASERS
 L1=						3
 K1=						1,0,0
-E1=						0,1,0
+E1=						0,0,0
 B1=						
 FREQ1= 					
 ENV_FREQ1=				1

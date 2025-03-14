@@ -1,5 +1,7 @@
 __pychache__
 
+*.txt
+
 # Executables
 *.exe
 *.out

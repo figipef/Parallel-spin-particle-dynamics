@@ -4,7 +4,7 @@
 
 double MASS = 1; 
 double CHARGE = 1;
-double G = 1; // hum whats this one?
+double G = 1; // hum whats this one? idk
 double a = 0.00116; //anomalous magetic moment
 
 // Calculate the cross product of two vectors
@@ -37,7 +37,87 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	return Om;
 }
 
-void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles,  int n_of_lasers){
+// Creates a histogram based on the Diagnostics specified before
+void PerformDiagnostics(Histogram& hist, Particle particle,  \
+	std::string* params, double* bsize, double* bmax, double* bmin, int n_of_pars){
+
+	if (n_of_pars == 0){
+        throw std::runtime_error("Not Enough Parameters to perform Diagnostics!");
+    } 
+
+	// Perform the cycle to save the data to an unordered array with the counting bins
+	
+	if (n_of_pars == 1) {
+
+		double value = 0;
+		int i = params[0][1] - '0'; // Get the particle index from the parameter character
+		switch(params[0][0]){
+			case 'p':
+				value = particle.getPosition()[i - 1];
+				break;
+			case 'm':
+				value = particle.getMomentum()[i - 1];
+				break;
+			case 's':
+				value = particle.getSpin()[i - 1];
+				break;
+		} 
+
+		if (!(value < bmin[0] || value > bmax[0])) { // Ignore out-of-range values
+
+			int index = std::round((value - bmin[0]) / bsize[0]); // Compute bin index
+			hist.vector1D[index]++; // Increment corresponding bin
+		}  
+
+	} else if (n_of_pars == 2) {
+
+		double value1 = 0;
+		int i = params[0][1] - '0'; // Get the particle index from the parameter character
+		switch(params[0][0]){
+			case 'p':
+				value1 = particle.getPosition()[i - 1];
+				break;
+			case 'm':
+				value1 = particle.getMomentum()[i - 1];
+				break;
+			case 's':
+				value1 = particle.getSpin()[i - 1];
+				break;
+		} 
+
+		double value2 = 0;
+		i = params[1][1] - '0'; // Get the particle index from the parameter character
+		switch(params[1][0]){
+			case 'p':
+				value2 = particle.getPosition()[i - 1];
+				break;
+			case 'm':
+				value2 = particle.getMomentum()[i - 1];
+				break;
+			case 's':
+				value2 = particle.getSpin()[i - 1];
+				break;
+		}
+
+		int index1;
+		int index2;
+		bool i1 = false;
+		bool i2 = false;
+
+		if (!(value1 < bmin[0] || value1 > bmax[0])) {index1 = std::round((value1 - bmin[0]) / bsize[0]); i1 = true;}  // Ignore out-of-range values and Compute bin index
+		if (!(value2 < bmin[1] || value2 > bmax[1])) {index2 = std::round((value2 - bmin[1]) / bsize[1]); i2 = true;}  // Ignore out-of-range values and Compute bin index
+
+		if (i1 && i2){
+			hist.matrix2D[index2][index1]++;  // Increment corresponding bin
+		}
+
+	} else {
+
+		throw std::runtime_error("PerformDiagnostics: Invalid number of params");
+	}
+}
+
+void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
@@ -156,13 +236,19 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 		}
 		p.setSpin(spn_next);
 
+		// If the histogram is passed, perform the Diagnostics
+		if(hist != nullptr && diag_params != nullptr){
+
+			PerformDiagnostics(*hist, p, diag_params -> params, \
+				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
+		}
     }
 }
 
 // Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {25,0,0};
-	double mom[3] = {0,0,0};
+	double pos[3] = {0,0,0};
+	double mom[3] = {0.1,-0.1,0};
     double spin[3] = {-1,0,1};
 
 	for (int i = 0; i < particle_number; ++i) {
@@ -170,41 +256,9 @@ void createParticles(Particle* particles, int particle_number){
 	}
 }
 
-// Creates a histogram based on the Diagnostics specified before
-void PerformDiagnostics(std::vector<int>*& hist, Particle particle,  \
-	std::string* params, double* bsize, double* bmax, double* bmin, int n_of_pars){
-
-	if (n_of_pars == 0){
-        throw std::runtime_error("Not Enough Parameters to perform Diagnostics!");
-    } 
-
-	// Perform the cycle to save the data to an unordered array with the counting bins
-	
-	for (int k = 0; k < n_of_pars; k++){
-		double value = 0;
-		int i = params[k][1] - '0'; // Get the particle index from the parameter character
-		switch(params[k][0]){
-			case 'p':
-				value = particle.getPosition()[i - 1];
-				break;
-			case 'm':
-				value = particle.getMomentum()[i - 1];
-				break;
-			case 's':
-				value = particle.getSpin()[i - 1];
-				break;
-		} 
-
-		if (value < bmin[k] || value > bmax[k]) break;  // Ignore out-of-range values
-
-    	int index = std::round((value - bmin[k]) / bsize[k]);  // Compute bin index
-    	hist[k][index]++;  // Increment corresponding bin
-	}
-}
-
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, double*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -394,83 +448,18 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     	throw std::runtime_error("Number of Input parameters does not match the bin parameters");
     }
 
+    if (n_par > 3){
+    	throw std::runtime_error("Number of diagnostic parameters larger than 2");
+    }
+
     n_par -= 1;
 
     for (int i = 0; i < n_par; i++){
 
-        bin_n[i] = (binmax[i] - binmin[i]) / binsize[i] + 1; // Calculate the size of the histogram
+        bin_n[i] = std::round((binmax[i] - binmin[i]) / binsize[i] + 1); // Calculate the size of the histogram
 
         if (bin_n[i] < 1){
         	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
         }
     }
-}
-
-// Writes the wanted values of a given particle to a file
-void writeToFile(std::ofstream& file, const Particle& p, char a){
-	const double* data = nullptr;
-
-	switch(a){
-
-		case 'p':
-
-			data = p.getPosition();
-			break;
-				
-		case 'm':
-
-			data = p.getMomentum();
-			break;
-
-		case 's':
-
-			data = p.getSpin();
-			break;
-
-		default:
-	        file << "Invalid option" << std::endl;
-            break;
-		}
-
-	// Check for nullptr before accessing data
-	if (data) {
-
-	    for (int i = 0; i < 3; i++) {
-	        file << data[i] << " ";
-	    }
-	    file << std::endl;
-
-	} else {
-	    file << "Error: Null data pointer" << std::endl;
-	}	
-}
-
-void writeDiagnosticsToFile(std::vector<std::ofstream>& diag_files, const std::vector<int>* histograms, const double t){
-
-	int counter = 0;
-
-	for (std::ofstream& file: diag_files){
-
-		if (!file) {
-            std::cerr << "Error: File stream is not open.\n";
-            continue;
-        }
-
-		file << t <<" "; // Save time at witch the measure was made
-
-		for (int value: histograms[counter]){
-			file << value << " ";
-		}
-
-		file << "\n";
-
-		counter ++;
-	}
-}
-
-// Helper function to help parse vectors
-void parseVector(const std::string& value, double vec[3]) {
-    std::istringstream ss(value);
-    char comma; // To skip the commas
-    ss >> vec[0] >> comma >> vec[1] >> comma >> vec[2];
 }
