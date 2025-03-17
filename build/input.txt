@@ -14,15 +14,15 @@ BIN_MIN_1=              -1
 BIN_MIN_2=              -1
 SHOW_E=                 1
 SHOW_B=                 1
-FIELD_BIN=              1
-FIELD_BIN_MIN=          0
+FIELD_BIN=              0.1
+FIELD_BIN_MIN=          1
 FIELD_BIN_MAX=          20
 FIELD_BIN_DIR=          1
 
 		   LASERS
 L1=						3
 K1=						1,0,0
-E1=						0,47,0
+E1=						0,1,0
 B1=						
 FREQ1= 					
 ENV_FREQ1=				1
