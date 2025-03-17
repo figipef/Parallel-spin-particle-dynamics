@@ -10,7 +10,7 @@ def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #t
     plt.figure(figsize=(8,5))
     plt.plot(t, q)
 
-    plt.xlabel('Time (units are overrated)', fontsize=16) #I will eventually uncover our dimessions
+    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
     plt.ylabel(ylabel, fontsize=16)
     plt.title(Title, fontsize=18)
 
@@ -39,7 +39,7 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
 
         plt.plot(t, q, label = labels[i])
 
-    plt.xlabel('Time (units are overrated)', fontsize=16) #I will eventually uncover our dimessions
+    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
     plt.ylabel(ylabel, fontsize=16)
     plt.title(Title, fontsize=18)
     plt.legend(fontsize=15)
@@ -61,7 +61,7 @@ def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #t
     plt.figure(figsize=(8,5))
     plt.plot(t, q)
 
-    plt.xlabel('Time (units are overrated)', fontsize=16) #I will eventually uncover our dimessions
+    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
     plt.ylabel(ylabel, fontsize=16)
     plt.title(Title, fontsize=18)
 
@@ -89,7 +89,7 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
 
         plt.plot(t, q, label = labels[i])
 
-    plt.xlabel('Time (units are overrated)', fontsize=16) #I will eventually uncover our dimessions
+    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
     plt.ylabel(ylabel, fontsize=16)
     plt.title(Title, fontsize=18)
     plt.legend(fontsize=15)

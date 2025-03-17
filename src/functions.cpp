@@ -244,7 +244,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 // Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {5,0,0};
+	double pos[3] = {150,0,0};
 	double mom[3] = {0,0,0};
     double spin[3] = {0,0,1};
 
@@ -460,7 +460,14 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     	if ("L"+std::to_string(l_index) == it->first && !it->second.empty()){ 
 
     		int type = std::stoi(it->second);
+    		int ext_phase = 0;
 
+    		// Set the external phase of the laser
+    		if (!values["PHASE" + std::to_string(l_index)].empty()){
+    			ext_phase = std::stoi(values["PHASE" + std::to_string(l_index)]);
+
+    		}
+    		std::cout << ext_phase<<"\n";
     		// Check for initial eletric field 
     		if (values["E" + std::to_string(l_index)].empty()) {throw std::runtime_error("No Electric field initalized! INITALIZE IT :) ");}
 
@@ -497,7 +504,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     				parseVector(values["E" + std::to_string(l_index)], temp_E);
     				parseVector(values["K" + std::to_string(l_index)], temp_k);
 
-    				lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, 'k', 'y');
+    				lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, 'k', 'y', ext_phase);
 
     			} else if (values["K" + std::to_string(l_index)].empty() && !values["B" + std::to_string(l_index)].empty()){
 
@@ -510,7 +517,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     				parseVector(values["E" + std::to_string(l_index)], temp_E);
     				parseVector(values["B" + std::to_string(l_index)], temp_B);
 
-    				lasers[l_index - 1] = Laser(temp_E, temp_B, -l_index, 'b', 'y', &freq);
+    				lasers[l_index - 1] = Laser(temp_E, temp_B, -l_index, 'b', 'y', ext_phase, &freq);
 
     			} else {throw std::runtime_error("Initalized both K and B for a constant field (type 1) (or both are empty)");}
 
@@ -524,7 +531,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     			parseVector(values["E" + std::to_string(l_index)], temp_E);
     			parseVector(values["K" + std::to_string(l_index)], temp_k);
 
-    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index);
+    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, ext_phase);
 
     		}else if (type == 3){
 
@@ -546,7 +553,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     			parseVector(values["E" + std::to_string(l_index)], temp_E);
     			parseVector(values["K" + std::to_string(l_index)], temp_k);
 
-    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, env_l, env_freq);
+    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, env_l, env_freq, ext_phase);
 
     		} else {throw std::runtime_error("Invalid Laser type");}
 
