@@ -32,13 +32,14 @@ int main() {
     double *binsize = new double[9];
     double *binmax = new double[9];
     double *binmin = new double[9];
+    double *fieldiag = new double[6];
     int n_par = 0;
     int* bin_n = new int[9];
 
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
     int laser_number;
     // Setup the variables
-    setupInputVariable(input_file, particle_number, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -134,6 +135,12 @@ int main() {
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();
+
+    std::cout << " Field diagnostics test:\nShow Efield " << *fieldiag << "\nShow Bfield " << fieldiag[1] << "\nBin size " << fieldiag[2] << "\nBin start " << fieldiag[3] << "\nBin end " << fieldiag[4] << "\n";
+
+    double dt = 1;
+    int iter = 30;
+    FieldDiagWritter(dt, iter, fieldiag, lasers, laser_number);
 
 	return 0;
 }
