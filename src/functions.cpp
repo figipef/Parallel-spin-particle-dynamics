@@ -235,7 +235,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 		// If the histogram is passed, perform the Diagnostics
 		if(hist != nullptr && diag_params != nullptr){
-			//std::cout <<"a\n";
+
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
@@ -253,9 +253,64 @@ void createParticles(Particle* particles, int particle_number){
 	}
 }
 
+void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, int& laser_number){
+	double dx, min, max, x;
+	double t;
+	int dir;
+	double pos[3] = {0.,0.,0.};
+
+	if (fieldiag[0] == 1.){
+		dx = fieldiag[2]; 
+		min = fieldiag[3];
+		max = fieldiag[4];
+		dir = fieldiag[5];
+		std::ofstream e_field_1("../output/e_field1.txt");
+		std::ofstream e_field_2("../output/e_field2.txt");
+		std::ofstream e_field_3("../output/e_field3.txt");
+		std::cout<<"look here idiot\n";
+		std::cout << "E = [ " <<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<< " ]\n";
+        std::cout << "B = [ " <<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<< " ]\n";
+		double t1 = 0.;
+		double pos1[3] = {2.,0,0};
+		for (t = 0.; t < iter*dt; t = t + dt){
+			for (x = min; x <= max; x = x + dx){
+				pos[dir-1] = x;
+				e_field_1 << lasers[0].get_fields(&t,pos)[0] <<" ";
+				e_field_2 << lasers[0].get_fields(&t,pos)[1] <<" ";
+				e_field_3 << lasers[0].get_fields(&t,pos)[2] <<" ";
+			}
+			e_field_1 << "\n";
+			e_field_2 << "\n";
+			e_field_3 << "\n";
+		}
+	}
+
+	if (fieldiag[1] == 1.){
+		dx = fieldiag[2]; 
+		min = fieldiag[3];
+		max = fieldiag[4];
+		dir = fieldiag[5];
+		std::ofstream b_field_1("../output/b_field1.txt");
+		std::ofstream b_field_2("../output/b_field2.txt");
+		std::ofstream b_field_3("../output/b_field3.txt");
+
+		for (t = 0.; t < iter*dt; t = t + dt){
+			for (x = min; x <= max; x = x + dx){
+				pos[dir-1] = x;
+				b_field_1 << lasers[0].get_fields(&t,pos)[3] <<" ";
+				b_field_2 << lasers[0].get_fields(&t,pos)[4] <<" ";
+				b_field_3 << lasers[0].get_fields(&t,pos)[5] <<" ";
+			}
+			b_field_1 << "\n";
+			b_field_2 << "\n";
+			b_field_3 << "\n";
+		}
+	}
+}
+
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, Laser*& lasers, int& laser_number){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -292,6 +347,13 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     int bm = 1;
 
     int l_index = 1; // Laser index / amount - 1 
+
+    bool show_b = true;
+    bool show_e = true;
+    bool field_bin = true;
+    bool field_bin_min = true;
+    bool field_bin_max = true;
+    bool field_bin_dir = true;
 
     auto it = values.begin(); // Iterator for the map
 
@@ -342,6 +404,57 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     		bm += 1; // Counter update
     		it = values.begin(); // Restart Iterator
     	}
+		
+		if ("SHOW_E" == it->first && !it->second.empty() && show_e){
+			std::cout << "Look here idiot\n";
+
+    		if ("1" == it->second ){fieldiag[0] = 1.;}
+			else {fieldiag[0] = 0.;}
+			show_e = false;
+			it = values.begin(); // Restart Iterator
+
+    	}
+
+		if ("SHOW_B" == it->first && !it->second.empty() && show_b){
+
+    		if ("1" == it->second ){fieldiag[1] = 1.;}
+			else {fieldiag[1] = 0.;}
+			show_b = false;
+			it = values.begin(); // Restart Iterator
+			
+    	}
+
+		if ("FIELD_BIN" == it->first && field_bin && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
+			std::cout << "bru1"<<"\n";
+    		fieldiag[2] = std::stod(it->second);
+    		field_bin = false;
+    		it = values.begin(); // Restart Iterator
+
+    	}
+
+		if ("FIELD_BIN_MIN" == it->first && field_bin_min && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
+			std::cout << "bru2"<<"\n";
+    		fieldiag[3] = std::stod(it->second);
+    		field_bin_min = false;
+    		it = values.begin(); // Restart Iterator
+    		
+    	}
+
+		if ("FIELD_BIN_MAX" == it->first && field_bin_max && ( fieldiag[0] == 1. || fieldiag[1] == 1) ){
+			std::cout << "bru3"<<"\n";
+    		fieldiag[4] = std::stod(it->second);
+    		field_bin_max = false;
+    		it = values.begin(); // Restart Iterator
+    		
+    	}
+
+		if ("FIELD_BIN_DIR" == it->first && field_bin_dir && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
+
+    		fieldiag[5] = std::stoi(it->second);
+    		field_bin_dir = false;
+    		it = values.begin(); // Restart Iterator
+    		
+    	}	
 
     	// Laser creation stuff
     	if ("L"+std::to_string(l_index) == it->first && !it->second.empty()){ 

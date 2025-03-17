@@ -12,6 +12,13 @@ BIN_MAX_1=              1
 BIN_MAX_2=              1                
 BIN_MIN_1=              -1
 BIN_MIN_2=              -1
+SHOW_E=                 1
+SHOW_B=                 1
+FIELD_BIN=              0.1
+FIELD_BIN_MIN=          1
+FIELD_BIN_MAX=          20
+FIELD_BIN_DIR=          1
+
 		   LASERS
 L1=						3
 K1=						1,0,0

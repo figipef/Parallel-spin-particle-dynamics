@@ -21,4 +21,5 @@ double inner(double[3], double[3]); // Calculates the inner product between 2 ve
 double gamma(double[3]); // Calculates the gamma for a vector
 void PerformDiagnostics(Histogram&, Particle,std::string*, double*, double*, double*, int);
 void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist = nullptr, DiagnosticParameters* diag_params = nullptr);void createParticles(Particle*, int); // Creates particles
-void setupInputVariable(std::ifstream&, int&, double&, double&, int&, std::string*&, double*&, double*&, double*&, int*&, int&, Laser*&, int&);
+void FieldDiagWritter(double&, int&, double*& fieldiag, Laser*& lasers, int& laser_number);
+void setupInputVariable(std::ifstream&, int&, double&, double&, int&, std::string*&, double*&, double*&, double*&, int*&, int&, double*&, Laser*&, int&);
