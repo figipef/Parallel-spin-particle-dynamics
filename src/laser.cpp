@@ -2,7 +2,7 @@
 
 Laser::Laser(){} // Default Constructor
 
-Laser::Laser(double _e_0[3], double _k[3], int _tag) : tag(_tag){
+Laser::Laser(double _e_0[3], double _k[3], int _tag, int _ext_phase) : tag(_tag), ext_phase(_ext_phase){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 	std::copy(_k, _k+3, k); // copy the wave vector _k to k
 
@@ -15,7 +15,7 @@ Laser::Laser(double _e_0[3], double _k[3], int _tag) : tag(_tag){
 	type = 2; // type is defined to know if it is initalized
 }
 
-Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_option, double* _freq) : tag(_tag){
+Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_option, int _ext_phase, double* _freq) : tag(_tag), ext_phase(_ext_phase){
 	// constructor for a bunch of stuff
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 
@@ -57,7 +57,7 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 	}else {throw std::runtime_error("Not a valid time option");}
 }
 
-Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq) : tag(_tag), length(_length), env_freq(_env_freq){
+Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq, int _ext_phase) : tag(_tag), length(_length), env_freq(_env_freq), ext_phase(_ext_phase){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 	
 	//std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
@@ -185,7 +185,7 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 
 		double* fields = new double[6];
 
-		double aux = cos(freq * (*t));
+		double aux = cos(freq * (*t) + ext_phase * M_PI / 2);
 
 		for (int i = 0; i < 3; ++i) fields[i] = e_0[i] * aux;
     	for (int i = 3; i < 6; ++i) fields[i] = b_0[i - 3] * aux;
@@ -201,7 +201,7 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 
 		double xdk = pos[0] * k[0] + pos[1] * k[1] + pos[2] * k[2]; // k.x for future calculations
 
-		double field_osc = cos(xdk - freq * (*t));// The field part responsible for oscilation
+		double field_osc = cos(xdk - freq * (*t) + ext_phase * M_PI / 2);// The field part responsible for oscilation
 
 		for (int i = 0; i < 3; i++) fields[i] = e_0[i] * field_osc;
 		for (int i = 3; i < 6; i++) fields[i] = b_0[i - 3] * field_osc;
@@ -219,7 +219,7 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 
 		double xdk = pos[0] * k[0] + pos[1] * k[1] + pos[2] * k[2]; // k.x for future calculations
 		//std::cout <<"xdk = "<< (xdk - freq * (*t)) / (length * M_PI)<<"\n";
-		double field_osc = cos(xdk - freq * (*t));// The field part responsible for oscilation
+		double field_osc = cos(xdk - freq * (*t) + ext_phase * M_PI / 2);// The field part responsible for oscilation
 
  		// Calculate the phase normalized to the length so that the function is 0 at phase = 0 and phase = L
 		double phase = (xdk/sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]) - 1 * (*t))* M_PI / length ;

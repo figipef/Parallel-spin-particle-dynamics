@@ -19,15 +19,16 @@ public:
 	double length; // length of the envelope
 	int tag; // Tag for identification
 	int type;
+	int ext_phase;
 
 	// default constructor
 	Laser();
 	// constructor with basica structure for an eletromagnetic field
-	Laser(double[3], double[3], int); // intensity vector (Eletric), wavevector, tag
+	Laser(double[3], double[3], int, int _ext_phase = 0); // intensity vector (Eletric), wavevector, tag
 	// constructor with the option of b or k field and on/off frequency
-	Laser(double[3], double[3], int, char, char, double* _freq = nullptr); // intensity vector (Eletric), wavevector, tag (Para usar frequência, pôr &_freq)
+	Laser(double[3], double[3], int, char, char, int _ext_phase = 0, double* _freq = nullptr); // intensity vector (Eletric), wavevector, tag (Para usar frequência, pôr &_freq)
 	// constructor for an envelope
-	Laser(double[3], double[3], int, double, double); // intensity vector (Eletric), wavevector, tag and envelope parameters
+	Laser(double[3], double[3], int, double, double, int _ext_phase = 0); // intensity vector (Eletric), wavevector, tag and envelope parameters
 	
 	double* get_E(double[3], double); // Return the true electric field at a point at a time
 	double* get_B(double[3], double); // Return the true magnetic field at a point at a time
