@@ -60,7 +60,7 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq) : tag(_tag), length(_length), env_freq(_env_freq){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 	
-	std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
+	//std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
 	std::copy(_k, _k+3, k); // copy the wave vector _k to k
 
 	b_0[0] = (k[1]*e_0[2] - k[2]*e_0[1])/1.; // calculate the cross product the  must be divided by c=1

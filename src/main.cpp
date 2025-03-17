@@ -118,9 +118,9 @@ int main() {
     }
 
     std::cout << "----Testing----\n";
-    double t = 1.32;
+    double t = 0;
     int tipo = 3;
-    double pos[3] = {1,1,-1};
+    double pos[3] = {1,0,0};
 
     for (int i = 0; i<6;i++){
         

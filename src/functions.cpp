@@ -235,6 +235,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 		// If the histogram is passed, perform the Diagnostics
 		if(hist != nullptr && diag_params != nullptr){
+
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
@@ -243,9 +244,9 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 // Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {0,0,0};
-	double mom[3] = {0.1,-0.1,0};
-    double spin[3] = {-1,0,1};
+	double pos[3] = {5,0,0};
+	double mom[3] = {0,0,0};
+    double spin[3] = {0,0,1};
 
 	for (int i = 0; i < particle_number; ++i) {
 	    particles[i] = Particle(pos,mom,spin,i);  // Dynamically allocate objects
@@ -573,7 +574,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     	binsize[i] = (binmax[i] - binmin[i]) / (bin_n[i] - 1 + 1e-308); // calculate the size of each bin
 
         //bin_n[i] = std::round((binmax[i] - binmin[i]) / binsize[i] + 1); // Calculate the size of the histogram
-    	std::cout << binsize[i];
+    	//std::cout << binsize[i];
         if (binsize[i] < 0){
         	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
         }
