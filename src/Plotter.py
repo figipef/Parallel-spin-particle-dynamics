@@ -86,8 +86,9 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
         q = Q[i]
         n = len(q)
         t = np.linspace(0., dt*n, n)
-
         plt.plot(t, q, label = labels[i])
+        
+        
 
     plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
     plt.ylabel(ylabel, fontsize=16)
@@ -100,7 +101,9 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
     if isinstance(Lims, (list, tuple)):
         plt.xlim((Lims[0][0], Lims[0][1]))
         plt.ylim((Lims[1][0], Lims[1][1]))
-
+    array = np.full(len(Q[0]), 1/np.sqrt(2))
+    t = np.linspace(0., dt*n, n)
+    plt.plot(t,array, color="Black")
     plt.grid(Grid)
     plt.show()
 

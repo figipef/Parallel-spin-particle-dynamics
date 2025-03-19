@@ -244,9 +244,9 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
 // Creates the particles to be used in the simulation
 void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {150,0,0};
+	double pos[3] = {-0.05,0,0};
 	double mom[3] = {0,0,0};
-    double spin[3] = {0,0,1};
+    double spin[3] = {0,0,0};
 
 	for (int i = 0; i < particle_number; ++i) {
 	    particles[i] = Particle(pos,mom,spin,i);  // Dynamically allocate objects

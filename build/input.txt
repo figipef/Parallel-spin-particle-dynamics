@@ -20,16 +20,16 @@ FIELD_BIN_MAX=          20
 FIELD_BIN_DIR=          1
 
 		   LASERS
-L1=						3
+L1=						2
 K1=						1,0,0
-E1=						0,0.70710678118,0
+E1=						0,1,0
 B1=						
 FREQ1= 					
 ENV_FREQ1=				1
 ENV_L1=                 125
 PHASE1=                 0
 
-L2=						3
+La2=					3
 K2=						1,0,0
 E2=						0,0,0.70710678118
 B2=						
