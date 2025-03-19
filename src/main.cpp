@@ -21,11 +21,15 @@ int main() {
     }
 
     // Initalize the variables for the Simulatiom
-    int particle_number;
+    
     double time_step;
     double total_time;
 
-    int step_diag;
+    // Initalize the variables for particle creation
+
+    int particle_number;
+    std::string *distribution_types = new std::string[3]; // "uni" or "gau"
+    double *distribution_sizes = new double[3]; // size of uniforms and std for gaussians
 
     // Initalize the variables for the Diagnostic
     std::string *params = new std::string[9];
@@ -36,16 +40,23 @@ int main() {
     int n_par = 0;
     int* bin_n = new int[9];
 
+    int step_diag;
+
+    // Initaliaze the variables for the lasers
+
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
     int laser_number;
+
     // Setup the variables
-    setupInputVariable(input_file, particle_number, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
     std::ofstream file_pos("../output/position.txt");
     std::ofstream file_mom("../output/momentum.txt");
     std::ofstream file_spn("../output/spin.txt");
+
+    std::ofstream file_electric_y("../output/e_field.txt");
 
     // ============================
     //   START OF MAIN CODE BLOCK
@@ -54,7 +65,9 @@ int main() {
     // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
-    createParticles(particles, particle_number);
+    createParticles(particles, particle_number, distribution_types, distribution_sizes, lasers, laser_number);
+
+    // Prints for health
 
     std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
 
@@ -63,8 +76,6 @@ int main() {
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();
-
-    std::ofstream file_electric_y("../output/e_field.txt");
 
     int counter = 0; // Counter for the diagnostics file numbering
     for (double t = 0; t <= total_time; t += time_step){

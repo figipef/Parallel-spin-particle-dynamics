@@ -12,14 +12,15 @@ private:
 
 	double e_0[3]; // Eletric field vector
 	double b_0[3]; // Magnetic field vector
+
 public:
 	double k[3]; // Wave vector
 	double freq; // frequency calculated from wave vector
 	double env_freq; // frequency for the envelope
 	double length; // length of the envelope
 	int tag; // Tag for identification
-	int type;
-	int ext_phase;
+	int type; // Type of Laser
+	int ext_phase; // external phase (increments of PI/2)
 
 	// default constructor
 	Laser();
