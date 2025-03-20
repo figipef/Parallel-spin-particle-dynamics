@@ -243,13 +243,117 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 }
 
 // Creates the particles to be used in the simulation
-void createParticles(Particle* particles, int particle_number){
-	double pos[3] = {150,0,0};
-	double mom[3] = {0,0,0};
-    double spin[3] = {0,0,1};
+void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, Laser* lasers, int n_of_lasers){ 
+
+	// types are defined by "uni" and "gau" || probably eventually change this to 0s && 1s to run faster
+	// CHANGE THIS NAME PLS dist_sizes is just the length of the box for uniform and a std for gaussian
+
+	//Calculate the initial position according to the lasers
+
+	int largest_laser_index = -1;
+	double largest_laser_length = 0;
+	double pos_shift[3] = {0,0,0};
+
+	for (int i = 0; i < n_of_lasers; i++){
+
+		if (lasers[i].type == 3 && lasers[i].length > largest_laser_length) {
+
+			largest_laser_length = lasers[i].length;
+			largest_laser_index = i;
+		}
+	}
+
+	if (largest_laser_index != 1){ // Adjust the initial positon according to the size of the laser
+		Laser l = lasers[largest_laser_index];
+
+		double abs_k = std::sqrt(l.k[0] * l.k[0] + l.k[1] * l.k[1] + l.k[2] + l.k[2]);
+		double mult = 0; // top differentiate from uniform and gaussian 
+
+		if (types[0] == "uni"){
+			mult = dist_sizes[0];
+		} else {
+			mult = dist_sizes[0] * 3;
+		}
+
+		// To copy the sign for k in case of negative k's
+		pos_shift[0] = l.k[0]/abs_k * l.length + (l.k[0] == 0 ? 0.0 : (std::copysign(1.0, l.k[0]) * mult));
+		pos_shift[1] = l.k[1]/abs_k * l.length + (l.k[1] == 0 ? 0.0 : (std::copysign(1.0, l.k[1]) * mult)); 
+		pos_shift[2] = l.k[2]/abs_k * l.length + (l.k[2] == 0 ? 0.0 : (std::copysign(1.0, l.k[2]) * mult));
+		
+	}
+
+    double spin[3] = {0,0,0};
+
+    std::random_device rd;   // Random seed generator
+    std::mt19937 gen(rd());  // Mersenne Twister PRNG seeded with rd()
+
+    // Declare distributions for future assignment
+    std::unique_ptr<std::uniform_real_distribution<double>> space_uniform;
+    std::unique_ptr<std::normal_distribution<double>> space_gaussian;
+    std::unique_ptr<std::uniform_real_distribution<double>> momentum_uniform;
+    std::unique_ptr<std::normal_distribution<double>> momentum_gaussian;
+
+    if (types[0] == "uni"){
+
+    	space_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[0], dist_sizes[0]);
+    
+    } else {
+
+    	space_gaussian = std::make_unique<std::normal_distribution<double>>(0.0, dist_sizes[0]);
+    }
+
+    if (types[1] == "uni") {
+
+    	momentum_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[1], dist_sizes[1]);
+
+    } else {
+
+    	momentum_gaussian = std::make_unique<std::normal_distribution<double>>(0.0, dist_sizes[1]);
+
+    }
 
 	for (int i = 0; i < particle_number; ++i) {
-	    particles[i] = Particle(pos,mom,spin,i);  // Dynamically allocate objects
+
+		double pos[3] = {0,0,0};
+		double mom[3] = {0,0,0};
+
+
+		// Assign the position values
+		if (types[0] == "uni"){
+
+			pos[0] = (*space_uniform)(gen);
+			pos[1] = (*space_uniform)(gen);
+			pos[2] = (*space_uniform)(gen);
+
+		} else { // For the Gaussian case, don't surpass 3 std's
+
+			do { pos[0] = (*space_gaussian)(gen); } while (std::abs(pos[0]) > 3 * dist_sizes[0]);
+			do { pos[1] = (*space_gaussian)(gen); } while (std::abs(pos[1]) > 3 * dist_sizes[0]);
+			do { pos[2] = (*space_gaussian)(gen); } while (std::abs(pos[2]) > 3 * dist_sizes[0]);
+
+		}
+
+		// Assign the momentum values
+		if (types[1] == "uni"){
+
+			mom[0] = (*momentum_uniform)(gen);
+			mom[1] = (*momentum_uniform)(gen);
+			mom[2] = (*momentum_uniform)(gen);
+
+		} else { // For the Gaussian case, don't surpass 3 std's
+
+			do { mom[0] = (*momentum_gaussian)(gen); } while (std::abs(mom[0]) > 3 * dist_sizes[1]);
+			do { mom[1] = (*momentum_gaussian)(gen); } while (std::abs(mom[1]) > 3 * dist_sizes[1]);
+			do { mom[2] = (*momentum_gaussian)(gen); } while (std::abs(mom[2]) > 3 * dist_sizes[1]);
+
+		}
+
+		pos[0] = pos[0] + pos_shift[0];
+		pos[1] = pos[1] + pos_shift[1];
+		pos[2] = pos[2] + pos_shift[2];
+
+	    particles[i] = Particle(pos,mom,spin,i);  // Create the particle to the array
+
 	}
 }
 
@@ -309,7 +413,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
-void setupInputVariable(std::ifstream& input_file, int& particle_n, double& timestep, double& totaltime, int& step_diag, std::string*& params,
+void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number){
 
 	/*
@@ -338,6 +442,13 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, double& time
     totaltime = std::stod(values["TOTAL_TIME"]);
 
     step_diag = std::stoi(values["STEPS_DIAG"]);
+
+    // Assign particle creation distribution parameters
+    dist_types[0] = values["POSITION_DIST_TYPE"];
+    dist_types[1] = values["MOMENTUM_DIST_TYPE"];
+
+    dist_sizes[0] = std::stod(values["POSITION_DIST_SIZE"]);
+    dist_sizes[1] = std::stod(values["MOMENTUM_DIST_SIZE"]);
 
     // Initalize counters for the bin parameters
 
