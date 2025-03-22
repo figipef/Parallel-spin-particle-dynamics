@@ -1,4 +1,6 @@
 #include "functions.hpp"
+#include <memory>
+
 
 // CONSTANTS (almost)
 
@@ -243,7 +245,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 }
 
 // Creates the particles to be used in the simulation
-void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, Laser* lasers, int n_of_lasers){ 
+void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* spin_dir, Laser* lasers, int n_of_lasers){ 
 
 	// types are defined by "uni" and "gau" || probably eventually change this to 0s && 1s to run faster
 	// CHANGE THIS NAME PLS dist_sizes is just the length of the box for uniform and a std for gaussian
@@ -292,6 +294,7 @@ void createParticles(Particle* particles, int particle_number, std::string* type
     std::unique_ptr<std::normal_distribution<double>> space_gaussian;
     std::unique_ptr<std::uniform_real_distribution<double>> momentum_uniform;
     std::unique_ptr<std::normal_distribution<double>> momentum_gaussian;
+	std::unique_ptr<std::uniform_real_distribution<double>> unif_1to0_dist; //standard 0 to 1 uniform dist im using for spin
 
     if (types[0] == "uni"){
 
@@ -351,6 +354,52 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 		pos[0] = pos[0] + pos_shift[0];
 		pos[1] = pos[1] + pos_shift[1];
 		pos[2] = pos[2] + pos_shift[2];
+
+		if (types[2] == "0"){
+
+			unif_1to0_dist = std::make_unique<std::uniform_real_distribution<double>>(0., 1.);
+
+			double phi = 2.*M_PI*(*unif_1to0_dist)(gen);
+			double cos_th = 2.*(*unif_1to0_dist)(gen) - 1.;
+			double sin_th = sqrt(1.- cos_th*cos_th);
+
+			spin[0] = sin_th*cos(phi);
+			spin[1] = sin_th*sin(phi);
+			spin[2] = cos_th;
+		
+		} else if (types[2] == "1"){
+
+			double Norm = sqrt(inner(spin_dir, spin_dir)); //sqrt(spin_dir[0]*spin_dir[0] + spin_dir[1]*spin_dir[1] + spin_dir[2]*spin_dir[2]);
+			spin[0] = spin_dir[0] / Norm;
+			spin[1] = spin_dir[1] / Norm;
+			spin[2] = spin_dir[2] / Norm;
+        
+		} else if (types[2] == "2"){
+			//double* s_try = new double[3];
+			bool accept = false;
+			unif_1to0_dist = std::make_unique<std::uniform_real_distribution<double>>(0., 1.);
+			while (!accept){
+				
+				double phi = 2.*M_PI*(*unif_1to0_dist)(gen);
+				double cos_th = 2.*(*unif_1to0_dist)(gen) - 1.;
+				double sin_th = sqrt(1.- cos_th*cos_th);
+	
+				spin[0] = sin_th*cos(phi);
+				spin[1] = sin_th*sin(phi);
+				spin[2] = cos_th;
+
+				double Norm = sqrt(inner(spin_dir, spin_dir));
+				for (int d=0; d<3; d++){
+					spin_dir[d] = spin_dir[d]/Norm;
+				}
+				
+
+				double prob = (*unif_1to0_dist)(gen);
+				double val = exp(dist_sizes[2]*(inner(spin_dir, spin)))*dist_sizes[2]/(4*M_PI*sinh(dist_sizes[2]));
+				if (prob <= val){accept = true;}
+			}
+
+		}
 
 	    particles[i] = Particle(pos,mom,spin,i);  // Create the particle to the array
 
@@ -413,7 +462,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
-void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double& timestep, double& totaltime, int& step_diag, std::string*& params,
+void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number){
 
 	/*
@@ -446,9 +495,20 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     // Assign particle creation distribution parameters
     dist_types[0] = values["POSITION_DIST_TYPE"];
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
+	dist_types[2] = values["SPIN_DIST_TYPE"];
+
+	if (dist_types[2] == "1" || dist_types[2] == "2"){
+		if(values["SPIN_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Spin Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
+		parseVector(values["SPIN_PREF_DIR"], spin_dir);
+	}
 
     dist_sizes[0] = std::stod(values["POSITION_DIST_SIZE"]);
     dist_sizes[1] = std::stod(values["MOMENTUM_DIST_SIZE"]);
+
+	if (dist_types[2] == "2"){
+		if(values["SPIN_DIST_SIZE"].empty()){{throw std::runtime_error("Von Mises-Fisher Distribution Selected But No Size Parameter Given! Please Initialize It Correctly in Input");}}
+		dist_sizes[2] = std::stod(values["SPIN_DIST_SIZE"]);
+	}
 
     // Initalize counters for the bin parameters
 
