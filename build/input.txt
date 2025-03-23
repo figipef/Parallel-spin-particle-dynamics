@@ -1,26 +1,52 @@
 INPUT VALUES
-NUMBER_OF_PARTICLES=  	1
+
 TIME_STEP=            	0.1 s
-TOTAL_TIME=  			20  s
+TOTAL_TIME=  			0.1  s
+STEPS_DIAG=             1
+
+		  PARTICLES
+
+NUMBER_OF_PARTICLES=  	10000
+POSITION_DIST_TYPE=     uni
+POSITION_DIST_SIZE=     5
+MOMENTUM_DIST_TYPE=     gau
+MOMENTUM_DIST_SIZE=     1
+SPIN_DIST_TYPE=         2
+SPIN_PREF_DIR=          1,1,-1
+SPIN_DIST_SIZE=         100
+
+
          DIAGNOSTICS
 PAR1=                   s1
-PAR2=                   p2
-PAR3=                   s2
-PAR4=					
-BIN_SIZE_1=             0.3
-BIN_SIZE_2=             0.12
-BIN_SIZE_3= 			0.2	
+PAR2=                   s2					
+BIN_NUMBER_1=           21
+BIN_NUMBER_2=           21 				
 BIN_MAX_1=              1
-BIN_MAX_2=              10
-BIN_MAX_3=              10   
-BIN_MIN_1=              -1 
-BIN_MIN_2=              -10
-BIN_MIN_3=				1
+BIN_MAX_2=              1              
+BIN_MIN_1=              -1
+BIN_MIN_2=              -1
+SHOW_E=                 0
+SHOW_B=                 0
+FIELD_BIN=              0.1
+FIELD_BIN_MIN=          1
+FIELD_BIN_MAX=          20
+FIELD_BIN_DIR=          1
+
 		   LASERS
-L1=						0
-K1=						
+L1=						3
+K1=						1,0,0
 E1=						0,0,0
-B1=						0,0,1
-FREQ1= 					0
-ENV_FREQ1=				0
-ENV_L1=                 0
+B1=						
+FREQ1= 					
+ENV_FREQ1=				1
+ENV_L1=                 5
+PHASE1=                 0
+
+La2=					3
+K2=						1,0,0
+E2=						0,0,0.70710678118
+B2=						
+FREQ2= 					
+ENV_FREQ2=				1
+ENV_L2=                 125
+PHASE2=                 1

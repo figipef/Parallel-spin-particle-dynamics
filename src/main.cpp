@@ -23,26 +23,43 @@ int main() {
     }
 
     // Initalize the variables for the Simulatiom
-    int particle_number;
+    
     double time_step;
     double total_time;
+
+    // Initalize the variables for particle creation
+
+    int particle_number;
+    std::string *distribution_types = new std::string[3]; // "uni" or "gau"
+    double *distribution_sizes = new double[3]; // size of uniforms and std for gaussians
 
     // Initalize the variables for the Diagnostic
     std::string *params = new std::string[9];
     double *binsize = new double[9];
     double *binmax = new double[9];
     double *binmin = new double[9];
+    double *fieldiag = new double[6];
+    double *spin_dir = new double[3];
     int n_par = 0;
-    double* bin_n = new double[9];
+    int* bin_n = new int[9];
+
+    int step_diag;
+
+    // Initaliaze the variables for the lasers
 
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
     int laser_number;
+
     // Setup the variables
-    setupInputVariable(input_file, particle_number, time_step, total_time, params, binsize, binmax, binmin, bin_n, n_par, lasers, laser_number);
-    
-    std::ofstream file_pos("output_position.txt");
-    std::ofstream file_mom("output_momentum.txt");
-    std::ofstream file_spn("output_spin.txt");
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+
+    DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
+
+    std::ofstream file_pos("../output/position.txt");
+    std::ofstream file_mom("../output/momentum.txt");
+    std::ofstream file_spn("../output/spin.txt");
+
+    std::ofstream file_electric_y("../output/e_field.txt");
 
     // ============================
     //   START OF MAIN CODE BLOCK
@@ -51,15 +68,9 @@ int main() {
     // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
-    createParticles(particles, particle_number);
+    createParticles(particles, particle_number, distribution_types, distribution_sizes, spin_dir, lasers, laser_number);
 
-    // Create the Laser array
-    //Laser* lasers =  new Laser[1];
-    //double E_field[3] = {0,0,0};
-    //double k[3] = {1,0,0}; 
-    //lasers[0] = Laser(E_field,k,0);
-    //double B_field[3] = {0,0,1};
-    //lasers[0].set_B_0(B_field);
+    // Prints for health
 
     std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
 
@@ -69,33 +80,38 @@ int main() {
     particles[0].display_momentum();
     particles[0].display_spin();
 
+    int counter = 0; // Counter for the diagnostics file numbering
     for (double t = 0; t <= total_time; t += time_step){
-        /*
-        std::vector<int>* histograms = new std::vector<int>[n_par]; // For Diagnostics Purposes
 
-        for (int i = 0; i < n_par; i++){
-            std::cout <<"a  "<<bin_n[i]<<std::endl;
-            histograms[i] = std::vector<int>(bin_n[i], 0); // Create the histograms necessary
+        // Perform Diagnostics
+
+        if (counter % step_diag == 0 && step_diag >= 1 && n_par > 0){
+
+            Histogram hist = createHistogram(n_par, bin_n);
+
+            boris(particles,lasers, t, time_step, particle_number, laser_number, &hist, &diag_params);
+            
+            writeDiagnosticsToFile(hist, counter, t);
+
+        } else { // Normal Boris run
+
+            boris(particles,lasers, t, time_step, particle_number, laser_number);
         }
         
-        // Testing the Diagnostics
-
-        PerformDiagnostics(histograms, particles[0], params, binsize, binmax, binmin, n_par); // use in the boris pusher
-
-        for (int value : histograms[0]) {
-            std::cout << value << " ";
+        for (double x =0; x <=20;x = x + 1){
+            double pos[3] = {x,0,0};
+            //std::cout << lasers[0].get_fields(pos, &t)[1] <<" ";
+            file_electric_y << lasers[0].get_fields(&t,pos)[1] <<" ";
         }
-        */
+        //std::cout <<"\n";
+        file_electric_y << "\n";
 
-        boris(particles,lasers, t, time_step, particle_number, laser_number);
-
+        // Following the information on particle 0
         writeToFile(file_pos, particles[0], 'p');
         writeToFile(file_mom, particles[0], 'm');
         writeToFile(file_spn, particles[0], 's');
 
-        //particles[0].display_position();
-        //particles[0].display_momentum();
-        //particles[0].display_spin();
+        counter++;
     }
 
 	// ===========================
@@ -116,43 +132,37 @@ int main() {
     }
 
     std::cout << "----Testing----\n";
-    double t = 1.32;
+    double t = 0;
     int tipo = 3;
-    double pos[3] = {1,1,-1};
+    double pos[3] = {1,0,0};
 
     for (int i = 0; i<6;i++){
         
-        std::cout << " Component "<<i<<" : "<< lasers[0].get_fields(&t, pos)[i]<<"\n";
+        std::cout << " Component "<<i+1<<" : "<< lasers[0].get_fields(&t, pos)[i]<<"\n";
     }
 
-    std::cout <<"Resultado: "<<cos(pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 1.41421) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5)<<"\n";
+    //std::cout <<"Resultado: "<<cos(pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 1.41421) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5) * sin((pos[0]*lasers[0].k[0] + pos[1]*lasers[0].k[1]+pos[2]*lasers[0].k[2] - t * 2)/5)<<"\n";
     std::cout << "---------\n\n";
-    particles[0].display_position();
-    particles[0].display_momentum();
-    particles[0].display_spin();
-    //std::cout<< particles[0].getPosition()[1] <<std::endl;
-    //double newpos[3] = {1,1,2};
-    //double teste[3] = {1,0,1};
-
-    //double* a = cross(newpos, teste);
-    //double b = inner(newpos, teste);
-    //std::cout << "Cross product: "<<a[0]<<", "<<a[1]<<", "<<a[2]<<std::endl;
-    //std::cout << "Inner Product: "<<b<<std::endl;
     
-    //particles[0].setPosition(newpos);
-    //std::cout<< particles[0].getPosition()[1] <<std::endl;
-
-    // testing omega
-    //double u[3] = {1,0,0};
-    double E[3] = {0,1,0};
-    double B[3] = {0,0,1};
-    //double s[3] = {0,0,0.5};
-    //double x[3] = {0,0,0};
     std::cout<< "Updating, 1 step" <<std::endl;
 
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();
+
+    std::cout << " Field diagnostics test:\nShow Efield " << *fieldiag << "\nShow Bfield " << fieldiag[1] << "\nBin size " << fieldiag[2] << "\nBin start " << fieldiag[3] << "\nBin end " << fieldiag[4] << "\n";
+
+    double dt = 1;
+    int iter = 30;
+    FieldDiagWritter(dt, iter, fieldiag, lasers, laser_number);
+
+    int N = 10000;
+    std::ofstream file_lots_spin("../output/lots_spin.txt");
+    for (int n = 0; n < N; n++){
+        writeToFile(file_lots_spin, particles[n], 's');
+    }
+
+    std::cout <<"should be finished\n";
 
 	return 0;
 }
