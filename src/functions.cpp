@@ -36,6 +36,9 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	for (int i = 0; i < 3; i++){
 		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
+
+	delete[] ucE;
+
 	return Om;
 }
 
@@ -119,14 +122,15 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 	}
 }
 
-void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
-
+void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
+	//std::cout << time<<" "<<n_of_particles<<"\n";
 	for (int i = 0; i < n_of_particles; ++i) {
 
 		double E_field[3] = {0,0,0};
 		double B_field[3] = {0,0,0};
 
 		Particle& p = particles[i];
+		//std::cout << p.getTag()<<"\n";
 
 		const double* p_position = p.getPosition();
 		const double* p_momentum = p.getMomentum();
@@ -147,6 +151,8 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 				B_field[k] = B_field[k] + fields[k+3];
 				//std::cout << "E " << E_field[k] << " B "<< B_field[k] <<"\n";
 			}
+
+			delete[] fields;
 		}
 
 		// 1st E half-step
@@ -241,6 +247,14 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
+
+		// Prevent memory leaks
+		delete[] uct;
+		delete[] ucs;
+		delete[] sct;
+		delete[] scs;
+		delete[] spn; 
+		delete[] Om;
     }
 }
 
@@ -420,7 +434,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		std::ofstream e_field_1("../output/e_field1.txt");
 		std::ofstream e_field_2("../output/e_field2.txt");
 		std::ofstream e_field_3("../output/e_field3.txt");
-		std::cout<<"look here idiot\n";
+		//std::cout<<"look here idiot\n";
 		std::cout << "E = [ " <<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<< " ]\n";
         std::cout << "B = [ " <<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<< " ]\n";
 		double t1 = 0.;
@@ -577,7 +591,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 		
 		if ("SHOW_E" == it->first && !it->second.empty() && show_e){
-			std::cout << "Look here idiot\n";
+			//std::cout << "Look here idiot\n";
 
     		if ("1" == it->second ){fieldiag[0] = 1.;}
 			else {fieldiag[0] = 0.;}
@@ -596,7 +610,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN" == it->first && field_bin && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-			std::cout << "bru1"<<"\n";
+			//std::cout << "bru1"<<"\n";
     		fieldiag[2] = std::stod(it->second);
     		field_bin = false;
     		it = values.begin(); // Restart Iterator
@@ -604,7 +618,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MIN" == it->first && field_bin_min && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-			std::cout << "bru2"<<"\n";
+			//std::cout << "bru2"<<"\n";
     		fieldiag[3] = std::stod(it->second);
     		field_bin_min = false;
     		it = values.begin(); // Restart Iterator
@@ -612,7 +626,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MAX" == it->first && field_bin_max && ( fieldiag[0] == 1. || fieldiag[1] == 1) ){
-			std::cout << "bru3"<<"\n";
+			//std::cout << "bru3"<<"\n";
     		fieldiag[4] = std::stod(it->second);
     		field_bin_max = false;
     		it = values.begin(); // Restart Iterator
@@ -638,7 +652,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     			ext_phase = std::stoi(values["PHASE" + std::to_string(l_index)]);
 
     		}
-    		std::cout << ext_phase<<"\n";
+    		//std::cout << ext_phase<<"\n";
     		// Check for initial eletric field 
     		if (values["E" + std::to_string(l_index)].empty()) {throw std::runtime_error("No Electric field initalized! INITALIZE IT :) ");}
 

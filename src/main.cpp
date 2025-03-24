@@ -10,7 +10,7 @@
 
 #include <mpi.h>
 
-int main() {
+int main(int argc, char** argv) {
 
     // ============================
     //   VARIABLE INTIALIZATION
@@ -19,7 +19,7 @@ int main() {
 	std::ifstream input_file("input.txt"); // Open the input file
 
     if (!input_file) {
-        throw std::runtime_error("Could not open the input file!");
+        std::cerr << "Could not open the input file!" << std::endl;
     }
 
     // Initalize the variables for the Simulatiom
@@ -70,8 +70,25 @@ int main() {
 
     createParticles(particles, particle_number, distribution_types, distribution_sizes, spin_dir, lasers, laser_number);
 
-    // Prints for health
+    // Divide the particle number to each process
 
+    // ==================================
+    //    PARALELIZATION INITIALIZATION
+    // ==================================
+
+    MPI_Init(&argc, &argv);
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    double start_time = MPI_Wtime(); // Performance Time check
+
+    int local_particle_count = particle_number / size;
+    int start_idx = rank * local_particle_count;
+    int end_idx = (rank == size - 1) ? particle_number : start_idx + local_particle_count;
+
+    // Prints for health
+    /*
     std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
 
     std::cout << "Magnetic field 0: "<<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<<std::endl;
@@ -79,45 +96,63 @@ int main() {
     particles[0].display_position();
     particles[0].display_momentum();
     particles[0].display_spin();
-
+    */
     int counter = 0; // Counter for the diagnostics file numbering
     for (double t = 0; t <= total_time; t += time_step){
 
         // Perform Diagnostics
 
-        if (counter % step_diag == 0 && step_diag >= 1 && n_par > 0){
+        if (step_diag >= 1 && counter % step_diag == 0 && n_par > 0){
 
-            Histogram hist = createHistogram(n_par, bin_n);
+            Histogram local_hist = createHistogram(n_par, bin_n);
+            Histogram global_hist = createHistogram(n_par, bin_n);
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number, &hist, &diag_params);
-            
-            writeDiagnosticsToFile(hist, counter, t);
+            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number, &local_hist, &diag_params);
+
+            int total_bins = (local_hist.is_matrix) ? (bin_n[0] * bin_n[1]) : bin_n[0];
+
+            // Flatten the histogram for communication
+            std::vector<int> local_flat = local_hist.flatten();
+            std::vector<int> global_flat(total_bins, 0);
+
+            // Perform MPI_Reduce
+            MPI_Reduce(local_flat.data(), global_flat.data(), total_bins, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+            // Rank 0 reconstructs global histogram
+            if (rank == 0) {
+                global_hist.from_flattened(global_flat, bin_n);
+                writeDiagnosticsToFile(global_hist, counter, t);
+            }
 
         } else { // Normal Boris run
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number);
+            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number);
         }
-        
-        for (double x =0; x <=20;x = x + 1){
-            double pos[3] = {x,0,0};
-            //std::cout << lasers[0].get_fields(pos, &t)[1] <<" ";
-            file_electric_y << lasers[0].get_fields(&t,pos)[1] <<" ";
-        }
-        //std::cout <<"\n";
-        file_electric_y << "\n";
 
         // Following the information on particle 0
-        writeToFile(file_pos, particles[0], 'p');
-        writeToFile(file_mom, particles[0], 'm');
-        writeToFile(file_spn, particles[0], 's');
-
+        if (rank == 0) {
+            writeToFile(file_pos, particles[0], 'p');
+            writeToFile(file_mom, particles[0], 'm');
+            writeToFile(file_spn, particles[0], 's');
+        }
         counter++;
+    }
+
+
+    // Calculate the time taken to process everything
+
+    double end_time = MPI_Wtime();
+    double elapsed_time = end_time - start_time;
+    double max_time;
+    MPI_Reduce(&elapsed_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        std::cout << "Max Execution Time across all processes: " << max_time << " seconds\n";
     }
 
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
-
+    /*
     // Lasers health
     std::cout << "---Lasers--- \n";
     for (int i = 0; i < laser_number; i++){
@@ -164,5 +199,20 @@ int main() {
 
     std::cout <<"should be finished\n";
 
+    */
+    delete[] lasers;
+    delete[] particles;
+
+    delete[] distribution_types;
+    delete[] distribution_sizes;
+    delete[] params;
+    delete[] binsize;
+    delete[] binmax;
+    delete[] binmin;
+    delete[] bin_n;
+    delete[] fieldiag;
+    delete[] spin_dir;
+
+    MPI_Finalize();
 	return 0;
 }
