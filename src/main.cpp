@@ -37,6 +37,7 @@ int main() {
     double *binmax = new double[9];
     double *binmin = new double[9];
     double *fieldiag = new double[6];
+    double *mom_dir = new double[3];
     double *spin_dir = new double[3];
     int n_par = 0;
     int* bin_n = new int[9];
@@ -49,7 +50,7 @@ int main() {
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -66,9 +67,7 @@ int main() {
     // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
-    createParticles(particles, particle_number, distribution_types, distribution_sizes, spin_dir, lasers, laser_number);
-
-    // Prints for health
+    createParticles(particles, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, lasers, laser_number);
 
     std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
 

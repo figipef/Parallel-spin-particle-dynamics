@@ -245,7 +245,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 }
 
 // Creates the particles to be used in the simulation
-void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* spin_dir, Laser* lasers, int n_of_lasers){ 
+void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* momentum_dir, double* spin_dir, Laser* lasers, int n_of_lasers){ 
 
 	// types are defined by "uni" and "gau" || probably eventually change this to 0s && 1s to run faster
 	// CHANGE THIS NAME PLS dist_sizes is just the length of the box for uniform and a std for gaussian
@@ -271,7 +271,7 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 		double abs_k = std::sqrt(l.k[0] * l.k[0] + l.k[1] * l.k[1] + l.k[2] + l.k[2]);
 		double mult = 0; // top differentiate from uniform and gaussian 
 
-		if (types[0] == "uni"){
+		if (types[0] == "0"){
 			mult = dist_sizes[0];
 		} else {
 			mult = dist_sizes[0] * 3;
@@ -296,7 +296,7 @@ void createParticles(Particle* particles, int particle_number, std::string* type
     std::unique_ptr<std::normal_distribution<double>> momentum_gaussian;
 	std::unique_ptr<std::uniform_real_distribution<double>> unif_1to0_dist; //standard 0 to 1 uniform dist im using for spin
 
-    if (types[0] == "uni"){
+    if (types[0] == "0"){
 
     	space_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[0], dist_sizes[0]);
     
@@ -305,7 +305,7 @@ void createParticles(Particle* particles, int particle_number, std::string* type
     	space_gaussian = std::make_unique<std::normal_distribution<double>>(0.0, dist_sizes[0]);
     }
 
-    if (types[1] == "uni") {
+    if (types[1] == "0") {
 
     	momentum_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[1], dist_sizes[1]);
 
@@ -322,34 +322,42 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 
 
 		// Assign the position values
-		if (types[0] == "uni"){
+		if (types[0] == "0"){
 
 			pos[0] = (*space_uniform)(gen);
 			pos[1] = (*space_uniform)(gen);
 			pos[2] = (*space_uniform)(gen);
 
-		} else { // For the Gaussian case, don't surpass 3 std's
+		} else if (types[0] == "1") { // For the Gaussian case, don't surpass 3 std's
 
 			do { pos[0] = (*space_gaussian)(gen); } while (std::abs(pos[0]) > 3 * dist_sizes[0]);
 			do { pos[1] = (*space_gaussian)(gen); } while (std::abs(pos[1]) > 3 * dist_sizes[0]);
 			do { pos[2] = (*space_gaussian)(gen); } while (std::abs(pos[2]) > 3 * dist_sizes[0]);
 
-		}
+		} else if (types[0] == "2") {
+			throw std::runtime_error("Still undefined");
+		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
 		// Assign the momentum values
-		if (types[1] == "uni"){
+		if (types[1] == "0"){
 
 			mom[0] = (*momentum_uniform)(gen);
 			mom[1] = (*momentum_uniform)(gen);
 			mom[2] = (*momentum_uniform)(gen);
 
-		} else { // For the Gaussian case, don't surpass 3 std's
+		} else if (types[1] == "1"){ // For the Gaussian case, don't surpass 3 std's
 
 			do { mom[0] = (*momentum_gaussian)(gen); } while (std::abs(mom[0]) > 3 * dist_sizes[1]);
 			do { mom[1] = (*momentum_gaussian)(gen); } while (std::abs(mom[1]) > 3 * dist_sizes[1]);
 			do { mom[2] = (*momentum_gaussian)(gen); } while (std::abs(mom[2]) > 3 * dist_sizes[1]);
 
-		}
+		} else if (types[1] == "2"){
+
+			mom[0] = momentum_dir[0];
+			mom[1] = momentum_dir[1];
+			mom[2] = momentum_dir[2];
+
+		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
 		pos[0] = pos[0] + pos_shift[0];
 		pos[1] = pos[1] + pos_shift[1];
@@ -462,7 +470,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
-void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
+void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number){
 
 	/*
@@ -496,6 +504,11 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     dist_types[0] = values["POSITION_DIST_TYPE"];
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
 	dist_types[2] = values["SPIN_DIST_TYPE"];
+
+	if (dist_types[1] == "2"){
+		if(values["MOMENTUM_DIST_TYPE"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
+		parseVector(values["MOMENTUM_PREF_DIR"], momentum_dir);
+	}
 
 	if (dist_types[2] == "1" || dist_types[2] == "2"){
 		if(values["SPIN_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Spin Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
@@ -577,7 +590,6 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 		
 		if ("SHOW_E" == it->first && !it->second.empty() && show_e){
-			std::cout << "Look here idiot\n";
 
     		if ("1" == it->second ){fieldiag[0] = 1.;}
 			else {fieldiag[0] = 0.;}
@@ -596,7 +608,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN" == it->first && field_bin && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-			std::cout << "bru1"<<"\n";
+
     		fieldiag[2] = std::stod(it->second);
     		field_bin = false;
     		it = values.begin(); // Restart Iterator
@@ -604,7 +616,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MIN" == it->first && field_bin_min && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-			std::cout << "bru2"<<"\n";
+
     		fieldiag[3] = std::stod(it->second);
     		field_bin_min = false;
     		it = values.begin(); // Restart Iterator
@@ -612,7 +624,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MAX" == it->first && field_bin_max && ( fieldiag[0] == 1. || fieldiag[1] == 1) ){
-			std::cout << "bru3"<<"\n";
+
     		fieldiag[4] = std::stod(it->second);
     		field_bin_max = false;
     		it = values.begin(); // Restart Iterator
@@ -638,7 +650,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     			ext_phase = std::stoi(values["PHASE" + std::to_string(l_index)]);
 
     		}
-    		std::cout << ext_phase<<"\n";
+
     		// Check for initial eletric field 
     		if (values["E" + std::to_string(l_index)].empty()) {throw std::runtime_error("No Electric field initalized! INITALIZE IT :) ");}
 
