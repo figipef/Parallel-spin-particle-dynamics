@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
     double *binmax = new double[9];
     double *binmin = new double[9];
     double *fieldiag = new double[6];
+    double *mom_dir = new double[3];
     double *spin_dir = new double[3];
     int n_par = 0;
     int* bin_n = new int[9];
@@ -51,7 +52,7 @@ int main(int argc, char** argv) {
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -68,9 +69,7 @@ int main(int argc, char** argv) {
     // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
-    createParticles(particles, particle_number, distribution_types, distribution_sizes, spin_dir, lasers, laser_number);
-
-    // Divide the particle number to each process
+    createParticles(particles, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, lasers, laser_number);
 
     // ==================================
     //    PARALELIZATION INITIALIZATION

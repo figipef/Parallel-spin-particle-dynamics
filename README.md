@@ -24,4 +24,14 @@ Type 2 - Von Miser-Fisher distribution with central direction and apperture para
 
 -> Position
 
+Type 0 - Uniform square with according to the size
+
+Type 1 - Gaussian in all 3 directions with standard deviation specified by size
+
 -> Momentum
+
+Type 0 - Uniform square with according to the size
+
+Type 1 - Gaussian in all 3 directions with standard deviation specified by size
+
+Type 2 - Specific direction
