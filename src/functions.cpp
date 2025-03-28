@@ -193,7 +193,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 		double u_minus[3];
 	
 		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + RR * (time_step / 2.0)*f_RR_Value[j];
+			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
 		};
 
         // auxiliary vector t
@@ -226,7 +226,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
         // 2nd E half-step
         double u_next[3];
         for (int j = 0; j < 3; ++j) {
-			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + RR * (time_step / 2.0)*f_RR_Value[j];
+			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
 		}
         
         // Update the particle's momentum
@@ -512,7 +512,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, bool& RR){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file

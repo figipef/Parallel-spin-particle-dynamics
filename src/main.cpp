@@ -154,7 +154,7 @@ int main() {
     int iter = 30;
     FieldDiagWritter(dt, iter, fieldiag, lasers, laser_number);
 
-    int N = 10000;
+    int N = particle_number;
     std::ofstream file_lots_spin("../output/lots_spin.txt");
     for (int n = 0; n < N; n++){
         writeToFile(file_lots_spin, particles[n], 's');
