@@ -201,7 +201,7 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		double* f_RR_Value_before;
 		// 1st E half-step
 		double u_minus[3];
-		
+
 		if (RR == 1) {
 			f_RR_Value_before = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
 
@@ -558,7 +558,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR, int*& particle_params){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -592,6 +592,10 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     dist_types[0] = values["POSITION_DIST_TYPE"];
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
 	dist_types[2] = values["SPIN_DIST_TYPE"];
+
+	particle_params[0] = std::stoi(values["FOLLOW_PARTICLE"]);
+	particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
+	particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
 
 	if (dist_types[1] == "2"){
 		if(values["MOMENTUM_DIST_TYPE"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}

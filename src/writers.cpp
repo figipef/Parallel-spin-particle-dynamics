@@ -28,7 +28,7 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 
 	// Check for nullptr before accessing data
 	if (data) {
-
+		
 	    for (int i = 0; i < 3; i++) {
 	        file << data[i] << " ";
 	    }

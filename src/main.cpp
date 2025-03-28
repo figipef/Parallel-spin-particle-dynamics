@@ -2,6 +2,7 @@
 #include "functions.hpp"
 #include "laser.hpp"
 
+#include <random>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -45,19 +46,21 @@ int main() {
 
     int step_diag;
 
+    int* follow_params = new int[3];
+
     // Initaliaze the variables for the lasers
 
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
-    std::ofstream file_pos("../output/position.txt");
-    std::ofstream file_mom("../output/momentum.txt");
-    std::ofstream file_spn("../output/spin.txt");
+    //std::ofstream file_pos("../output/position.txt");
+    //std::ofstream file_mom("../output/momentum.txt");
+    //std::ofstream file_spn("../output/spin.txt");
 
     std::ofstream file_electric_y("../output/e_field.txt");
 
@@ -70,16 +73,58 @@ int main() {
 
     createParticles(particles, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, lasers, laser_number);
 
-    std::cout << "Electric field 0: "<<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<<std::endl;
+    int* followed_particles;
+    int number_follow_particles = 0;
 
-    std::cout << "Magnetic field 0: "<<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<<std::endl;
+    std::ofstream file_pos[100];
+    std::ofstream file_mom[100];
+    std::ofstream file_spn[100];
 
-    particles[0].display_position();
-    particles[0].display_momentum();
-    particles[0].display_spin();
+    if (follow_params[2] > particle_number){std::cout <<" Number of Particles is too high\n";}
+
+    if (follow_params[0] == 1){
+
+        if (follow_params[1] == 1){
+
+            followed_particles = new int[follow_params[2]];
+
+            std::random_device rd;
+            std::mt19937 gen(rd()); // Mersenne Twister engine
+            std::uniform_int_distribution<> dis(0, particle_number);
+
+            number_follow_particles = follow_params[2];
+
+            for (int i = 0; i < number_follow_particles; i++){
+
+                followed_particles[i] = dis(gen);
+                std::cout << followed_particles[i] << "\n";
+                
+                file_pos[i].open("../output/position" + std::to_string(followed_particles[i]) + ".txt");
+                file_mom[i].open("../output/momentum" + std::to_string(followed_particles[i]) + ".txt");
+                file_spn[i].open("../output/spin" + std::to_string(followed_particles[i]) + ".txt");
+
+            }
+
+        } else if (follow_params[1] == 0){
+
+            followed_particles = new int[1];
+
+            number_follow_particles = 1;
+
+            followed_particles[0] = follow_params[2];
+
+            file_pos[0].open("../output/position" + std::to_string(followed_particles[0]) + ".txt");
+            file_mom[0].open("../output/momentum" + std::to_string(followed_particles[0]) + ".txt");
+            file_spn[0].open("../output/spin" + std::to_string(followed_particles[0]) + ".txt");
+
+        } else {
+
+            std::cout <<"smth is wrong with following \n";
+        }
+    }
 
     int counter = 0; // Counter for the diagnostics file numbering
-    
+
     for (double t = 0; t <= total_time; t += time_step){
 
         printProgressBar(t, total_time, 50);
@@ -99,10 +144,19 @@ int main() {
             boris(particles, lasers, t, time_step, particle_number, laser_number, RR);
         }
 
+        if (follow_params[0] == 1){
+
+            for (int i = 0; i < number_follow_particles; i++){
+                writeToFile(file_pos[i], particles[followed_particles[i]], 'p');
+                writeToFile(file_mom[i], particles[followed_particles[i]], 'm');
+                writeToFile(file_spn[i], particles[followed_particles[i]], 's');
+            }                
+        }
+
         // Following the information on particle 0
-        writeToFile(file_pos, particles[0], 'p');
-        writeToFile(file_mom, particles[0], 'm');
-        writeToFile(file_spn, particles[0], 's');
+        //writeToFile(file_pos, particles[0], 'p');
+        //writeToFile(file_mom, particles[0], 'm');
+        //writeToFile(file_spn, particles[0], 's');
 
         counter++;
     }
@@ -172,6 +226,9 @@ int main() {
     delete[] fieldiag;
     delete[] mom_dir;
     delete[] spin_dir;
+
+    delete[] follow_params;
+    delete[] followed_particles;
 
 	return 0;
 }
