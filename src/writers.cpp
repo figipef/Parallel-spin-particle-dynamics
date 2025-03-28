@@ -93,3 +93,22 @@ void parseVector(const std::string& value, double vec[3]) {
     char comma; // To skip the commas
     ss >> vec[0] >> comma >> vec[1] >> comma >> vec[2];
 }
+
+// Courtesy of João Chaveiro
+void printProgressBar(int progress, int total, int barWidth) {
+
+  float percent = (float)progress / total;
+  int filled = percent * barWidth;
+
+  std::cout << "\r[";
+  for (int i = 0; i <= barWidth; i++) {
+      if (i < filled)
+          std::cout << "=";
+      else if (i == filled)
+          std::cout << ">";
+      else
+          std::cout << " ";
+  }
+  std::cout << "] " << int(percent * 100.0) << "%";
+  std::cout.flush();
+}

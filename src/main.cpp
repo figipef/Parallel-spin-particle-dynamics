@@ -79,30 +79,25 @@ int main() {
     particles[0].display_spin();
 
     int counter = 0; // Counter for the diagnostics file numbering
+    
     for (double t = 0; t <= total_time; t += time_step){
+
+        printProgressBar(t, total_time, 50);
 
         // Perform Diagnostics
 
-        if (counter % step_diag == 0 && step_diag >= 1 && n_par > 0){
+        if (step_diag >= 1 && counter % step_diag == 0  && n_par > 0){
 
             Histogram hist = createHistogram(n_par, bin_n);
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number, RR, &hist, &diag_params);
+            boris(particles, lasers, t, time_step, particle_number, laser_number, RR, &hist, &diag_params);
             
             writeDiagnosticsToFile(hist, counter, t, params, n_par);
 
         } else { // Normal Boris run
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number, RR);
+            boris(particles, lasers, t, time_step, particle_number, laser_number, RR);
         }
-        
-        for (double x =0; x <=20;x = x + 1){
-            double pos[3] = {x,0,0};
-            //std::cout << lasers[0].get_fields(pos, &t)[1] <<" ";
-            file_electric_y << lasers[0].get_fields(&t,pos)[1] <<" ";
-        }
-        //std::cout <<"\n";
-        file_electric_y << "\n";
 
         // Following the information on particle 0
         writeToFile(file_pos, particles[0], 'p');
@@ -115,7 +110,7 @@ int main() {
 	// ===========================
 	//   PRINTS TO CHECK HEALTH
 	// ===========================
-
+    /*
     // Lasers health
     std::cout << "---Lasers--- \n";
     for (int i = 0; i < laser_number; i++){
@@ -159,8 +154,8 @@ int main() {
     for (int n = 0; n < N; n++){
         writeToFile(file_lots_spin, particles[n], 's');
     }
-
-    std::cout <<"should be finished\n";
+    */
+    std::cout <<"\nshould be finished\n";
 
     //  Clean the Dinamically allocated memory
 

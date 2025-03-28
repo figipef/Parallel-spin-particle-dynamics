@@ -1,6 +1,6 @@
 # Compiler
 CXX := g++
-CXXFLAGS := -std=c++14 -fsanitize=address,undefined -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2
+CXXFLAGS := -std=c++14 -fsanitize=address -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2
 
 #-fsanitize=address,undefined to check memory leaks
 
@@ -20,7 +20,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 $(info $(SRCDIR))
 
 # Program name
-PROGRAM_NAME := test
+PROGRAM_NAME := test.exe
 ifdef NAME
 	PROGRAM_NAME := $(NAME)
 endif

@@ -38,38 +38,46 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	for (int i = 0; i < 3; i++){
 		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
+
+	delete[] ucE; 
+
 	return Om;
 }
 
-double* f_RR(double gamma, double u[3], double E[3], double B[3]){
-	double dotB_u = inner(B, u);
-	double dotE_u = inner(E,u);
- 	double b2 = inner(B, B);
-	double* crossB_E = cross(B,E);
-	double sigma0 = (2*omega0*CHARGE*CHARGE)/(3*MASS*C*C*C);
+double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
 
-	// defining F^2u
-	double F2_u[3]; 
-	for (int i = 0; i<3; i++){
-		F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
-	}  
+    double dotB_u = inner(B, u);
+    double dotE_u = inner(E, u);
+    double b2 = inner(B, B);
+    
+    double* crossB_E = cross(B, E);  // Ensure `cross` dynamically allocates memory
 
-	// (u | F^2 u)
-	double dotu_F2u = -inner(u,F2_u);
-	// (u | F^2 u)u
-	double spatial_result[3];
-	for (int i = 0; i<3; i++){
-		spatial_result[i] = F2_u[i] - dotu_F2u * u[i];
-	} 
+    double sigma0 = (2 * omega0 * CHARGE * CHARGE) / (3 * MASS * C * C * C);
 
-	double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
-	double* result = new double[3];
+    // F^2 * u
+    double F2_u[3]; 
+    for (int i = 0; i < 3; i++) {
+        F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
+    }
+
+    double dotu_F2u = -inner(u, F2_u);
+
+    double spatial_result[3];
+    for (int i = 0; i < 3; i++) {
+        spatial_result[i] = F2_u[i] - dotu_F2u * u[i];
+    } 
+
+    double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
+	
+    double* result = new double[3];
+    
     for (int i = 0; i < 3; i++) {
         result[i] = factor * spatial_result[i];
     }
-    
-    return result;
-
+	
+    delete[] crossB_E; // Ensure `crossB_E` was allocated properly before deleting
+	
+    return result;  // Caller must free this
 }
 
 // Creates a histogram based on the Diagnostics specified before
@@ -152,13 +160,13 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 	}
 }
 
-void boris(Particle*& particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, int RR, Histogram* hist, DiagnosticParameters* diag_params){
+void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, int RR, Histogram* hist, DiagnosticParameters* diag_params){
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
 		double E_field[3] = {0,0,0};
 		double B_field[3] = {0,0,0};
-
+		
 		Particle& p = particles[i];
 
 		const double* p_position = p.getPosition();
@@ -171,7 +179,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 
    			//const double* laser_E = lasers[j].get_E_0();
    			//const double* laser_B = lasers[j].get_B_0();
-
+			
    			double* fields = lasers[j].get_fields(&time, p_position); // These might not be used
    			//std::cout << "Pos: "<<p_position[0]<<" "<<p_position[1]<<" "<<p_position[2]<<"\n";
 
@@ -180,15 +188,18 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 				B_field[k] = B_field[k] + fields[k+3];
 				//std::cout << "E " << E_field[k] << " B "<< B_field[k] <<"\n";
 			}
+			
+			delete[] fields;
+
 		}
 
 		double p_momentum_copy[3];
 		p_momentum_copy[0] = p_momentum[0];
 		p_momentum_copy[1] = p_momentum[1];
 		p_momentum_copy[2] = p_momentum[2];
-
+		
 		double* f_RR_Value = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
-	
+		
 		// 1st E half-step
 		double u_minus[3];
 	
@@ -246,7 +257,7 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 		}
 
 		particles[i].setPosition(new_pos);
-
+		
 		//Spin update
 
 		// reusing auxiliary vectors t and s
@@ -282,6 +293,15 @@ void boris(Particle*& particles, Laser* lasers, double time, double time_step, i
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
+
+		delete[] spn;
+		delete[] uct;
+		delete[] ucs;
+		delete[] sct;
+		delete[] scs;
+		delete[] Om;
+		delete[] f_RR_Value;
+
     }
 }
 
@@ -299,14 +319,14 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 
 	for (int i = 0; i < n_of_lasers; i++){
 
-		if (lasers[i].type == 3 && lasers[i].length > largest_laser_length) {
+		if (lasers[i].type == 3){// && lasers[i].length > largest_laser_length) {
 
 			largest_laser_length = lasers[i].length;
 			largest_laser_index = i;
 		}
 	}
 
-	if (largest_laser_index != 1){ // Adjust the initial positon according to the size of the laser
+	if (largest_laser_index != -1){ // Adjust the initial positon according to the size of the laser
 		Laser l = lasers[largest_laser_index];
 
 		double abs_k = std::sqrt(l.k[0] * l.k[0] + l.k[1] * l.k[1] + l.k[2] + l.k[2]);
@@ -375,8 +395,6 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 			do { pos[1] = (*space_gaussian)(gen); } while (std::abs(pos[1]) > 3 * dist_sizes[0]);
 			do { pos[2] = (*space_gaussian)(gen); } while (std::abs(pos[2]) > 3 * dist_sizes[0]);
 
-		} else if (types[0] == "2") {
-			throw std::runtime_error("Still undefined");
 		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
 		// Assign the momentum values
