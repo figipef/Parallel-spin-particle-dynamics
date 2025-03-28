@@ -604,10 +604,6 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 		
 		if ("SHOW_E" == it->first && !it->second.empty() && show_e){
-<<<<<<< HEAD
-			//std::cout << "Look here idiot\n";
-=======
->>>>>>> 04ed5dd1a2f834968b0bb1b287a47eb49a20e56d
 
     		if ("1" == it->second ){fieldiag[0] = 1.;}
 			else {fieldiag[0] = 0.;}
@@ -626,11 +622,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN" == it->first && field_bin && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-<<<<<<< HEAD
-			//std::cout << "bru1"<<"\n";
-=======
 
->>>>>>> 04ed5dd1a2f834968b0bb1b287a47eb49a20e56d
     		fieldiag[2] = std::stod(it->second);
     		field_bin = false;
     		it = values.begin(); // Restart Iterator
@@ -638,11 +630,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MIN" == it->first && field_bin_min && ( fieldiag[0] == 1. || fieldiag[1] == 1)){
-<<<<<<< HEAD
-			//std::cout << "bru2"<<"\n";
-=======
 
->>>>>>> 04ed5dd1a2f834968b0bb1b287a47eb49a20e56d
     		fieldiag[3] = std::stod(it->second);
     		field_bin_min = false;
     		it = values.begin(); // Restart Iterator
@@ -650,11 +638,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     	}
 
 		if ("FIELD_BIN_MAX" == it->first && field_bin_max && ( fieldiag[0] == 1. || fieldiag[1] == 1) ){
-<<<<<<< HEAD
-			//std::cout << "bru3"<<"\n";
-=======
 
->>>>>>> 04ed5dd1a2f834968b0bb1b287a47eb49a20e56d
     		fieldiag[4] = std::stod(it->second);
     		field_bin_max = false;
     		it = values.begin(); // Restart Iterator
@@ -680,11 +664,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     			ext_phase = std::stoi(values["PHASE" + std::to_string(l_index)]);
 
     		}
-<<<<<<< HEAD
-    		//std::cout << ext_phase<<"\n";
-=======
 
->>>>>>> 04ed5dd1a2f834968b0bb1b287a47eb49a20e56d
     		// Check for initial eletric field 
     		if (values["E" + std::to_string(l_index)].empty()) {throw std::runtime_error("No Electric field initalized! INITALIZE IT :) ");}
 
