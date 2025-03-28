@@ -1,20 +1,20 @@
 import numpy as np
-import Reader as R
-import Plotter as P
+from python_helper import Reader as R
+from python_helper import Plotter as P
 import matplotlib.pyplot as plt
 
-#v = R.read_output("../output/e_field.txt")
-#w = R.read_output("../output/position.txt")
-#z = R.read_output("../output/spin.txt")
+#v = R.read_output("output/e_field.txt")
+#w = R.read_output("output/position.txt")
+#z = R.read_output("output/spin.txt")
 
-#p = R.read_output("../output/momentum.txt")
-s = R.read_output("../output/lots_spin.txt")
+#p = R.read_output("output/momentum.txt")
+s = R.read_output("output/lots_spin.txt")
 
 #print(v)
 #print('-----------------------------')
 #print(v[:,1])
 print('-----------------------------')
-d = R.read_input("../build/input.txt")
+d = R.read_input("build/input.txt")
 #print(d)
 
 #P.plot_v_time(v[:,0], d['TIME_STEP'], Title="TESTING", ylabel="I honestly forgor", Grid=False, Lims=((0.,15.),(-2,3)))

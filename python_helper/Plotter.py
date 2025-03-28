@@ -5,7 +5,7 @@ import seaborn as sns
 import os
 import re
 from matplotlib.widgets import Slider
-import Reader as R
+from python_helper import Reader as R
 
 def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
     n = len(q)
