@@ -21,9 +21,6 @@ $(info $(SRCDIR))
 
 # Program name
 PROGRAM_NAME := test.exe
-ifdef NAME
-	PROGRAM_NAME := $(NAME)
-endif
 
 # Target binary
 TARGET := $(BINDIR)/$(PROGRAM_NAME)
@@ -32,19 +29,19 @@ TARGET := $(BINDIR)/$(PROGRAM_NAME)
 all: $(TARGET)
 
 # Linking
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) | $(OUTDIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 # Compilation
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(OBJDIR)/%.o: $(INCDIR)/chi2/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
 # Create build directory
 $(OBJDIR):
-	mkdir obj
+	mkdir -p $(OBJDIR)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
 
 # Clean
 clean:

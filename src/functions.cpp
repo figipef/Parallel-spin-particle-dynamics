@@ -197,15 +197,27 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		p_momentum_copy[0] = p_momentum[0];
 		p_momentum_copy[1] = p_momentum[1];
 		p_momentum_copy[2] = p_momentum[2];
-		
-		double* f_RR_Value = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
-		
+
+		double* f_RR_Value_before;
 		// 1st E half-step
 		double u_minus[3];
-	
-		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
-		};
+		
+		if (RR == 1) {
+			f_RR_Value_before = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_before[j];
+		    }
+
+		} else if (RR == 0) {
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
+		    }
+
+		} else {
+		    throw std::runtime_error("Invalid RR Value");
+		}
 
         // auxiliary vector t
         double t_vec[3];
@@ -232,13 +244,31 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		double* ucs = cross(u_prime, s_vec);
 		for (int j = 0; j < 3; ++j) {
 			u_plus[j] = u_minus[j] + ucs[j];
-		}
-        
+		}	
+
         // 2nd E half-step
         double u_next[3];
-        for (int j = 0; j < 3; ++j) {
-			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
+
+        double* f_RR_Value_after;
+
+        if (RR == 1) { // Calculate the Radiation Reaction
+        	f_RR_Value_after = f_RR(gamma(u_plus),u_plus,E_field,B_field);
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_after[j];
+		    }
+
+		} else if (RR == 0) {
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
+		    }
+
+		} else {
+
+		    throw std::runtime_error("Invalid RR Value");
 		}
+
         
         // Update the particle's momentum
 		p.setMomentum(u_next);
@@ -246,15 +276,12 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		// Now we update the particle position with the new momentum
 		double new_gamma = gamma(u_next);
 
-		double new_v[3];
-		for (int j= 0; j <3; j++){
-			new_v[j] = u_next[j] / (new_gamma * MASS);  
+		double new_pos[3];
+
+		for (int j= 0; j <3; j++){ // update the position whilst calculating the velocity
+			new_pos[j] = p_position[j] + time_step * u_next[j] / (new_gamma * MASS); 
 		}
 
-		double new_pos[3];
-		for (int j= 0; j <3; j++){
-			new_pos[j] = p_position[j] + time_step * new_v[j]; 
-		}
 
 		particles[i].setPosition(new_pos);
 		
@@ -300,7 +327,8 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		delete[] sct;
 		delete[] scs;
 		delete[] Om;
-		delete[] f_RR_Value;
+		delete[] f_RR_Value_before;
+		delete[] f_RR_Value_after;
 
     }
 }
