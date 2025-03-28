@@ -39,7 +39,7 @@ int main() {
     double *fieldiag = new double[6];
     double *mom_dir = new double[3];
     double *spin_dir = new double[3];
-    int RR;
+    int RR = 0;
     int n_par = 0;
     int* bin_n = new int[9];
 
@@ -89,7 +89,7 @@ int main() {
 
             boris(particles,lasers, t, time_step, particle_number, laser_number, RR, &hist, &diag_params);
             
-            writeDiagnosticsToFile(hist, counter, t);
+            writeDiagnosticsToFile(hist, counter, t, params, n_par);
 
         } else { // Normal Boris run
 
@@ -161,6 +161,22 @@ int main() {
     }
 
     std::cout <<"should be finished\n";
+
+    //  Clean the Dinamically allocated memory
+
+    delete[] lasers;
+    delete[] particles;
+
+    delete[] distribution_types;
+    delete[] distribution_sizes;
+    delete[] params;
+    delete[] binsize;
+    delete[] binmax;
+    delete[] binmin;
+    delete[] bin_n;
+    delete[] fieldiag;
+    delete[] mom_dir;
+    delete[] spin_dir;
 
 	return 0;
 }

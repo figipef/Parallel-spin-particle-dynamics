@@ -1,6 +1,8 @@
 # Compiler
 CXX := g++
-CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2
+CXXFLAGS := -std=c++14 -fsanitize=address,undefined -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2
+
+#-fsanitize=address,undefined to check memory leaks
 
 # Directories
 ROOTDIR := ..

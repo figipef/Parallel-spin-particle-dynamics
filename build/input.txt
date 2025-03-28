@@ -2,7 +2,7 @@ INPUT VALUES
 
 TIME_STEP=            	0.1 s
 TOTAL_TIME=  			10  s
-STEPS_DIAG=             1
+STEPS_DIAG=             0
 
 		  PARTICLES
 
