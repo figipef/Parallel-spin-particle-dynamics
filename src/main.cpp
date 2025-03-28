@@ -189,16 +189,18 @@ int main(int argc, char** argv) {
     double dt = 1;
     int iter = 30;
     FieldDiagWritter(dt, iter, fieldiag, lasers, laser_number);
+    */
 
-    int N = 10000;
     std::ofstream file_lots_spin("../output/lots_spin.txt");
-    for (int n = 0; n < N; n++){
-        writeToFile(file_lots_spin, particles[n], 's');
+    for (int n = 0; n < particle_number; n++){
+        if (rank == 0){
+            writeToFile(file_lots_spin, particles[n], 's');
+        }  
     }
 
     std::cout <<"should be finished\n";
-
-    */
+ 
+    
     delete[] lasers;
     delete[] particles;
 
