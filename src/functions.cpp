@@ -334,7 +334,7 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 }
 
 // Creates the particles to be used in the simulation
-void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* momentum_dir, double* spin_dir, Laser* lasers, int n_of_lasers){ 
+void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* position_dir, double* momentum_dir, double* spin_dir, Laser* lasers, int n_of_lasers){ 
 
 	// types are defined by "uni" and "gau" || probably eventually change this to 0s && 1s to run faster
 	// CHANGE THIS NAME PLS dist_sizes is just the length of the box for uniform and a std for gaussian
@@ -422,6 +422,12 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 			do { pos[0] = (*space_gaussian)(gen); } while (std::abs(pos[0]) > 3 * dist_sizes[0]);
 			do { pos[1] = (*space_gaussian)(gen); } while (std::abs(pos[1]) > 3 * dist_sizes[0]);
 			do { pos[2] = (*space_gaussian)(gen); } while (std::abs(pos[2]) > 3 * dist_sizes[0]);
+
+		} else if (types[0] == "2") {
+
+			pos[0] = position_dir[0];
+			pos[1] = position_dir[1];
+			pos[2] = position_dir[2];
 
 		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
@@ -557,7 +563,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
-void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
+void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& position_dir, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR, int*& particle_params){
 
 	/*
@@ -597,8 +603,13 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
 	particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
 	particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
 
+	if (dist_types[0] == "2"){
+		if(values["POSITION_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Position Selected But No Coordinates Indicated! Please Initialize It Correctly in Input");}}
+		parseVector(values["POSITION_PREF_DIR"], position_dir);
+	}
+
 	if (dist_types[1] == "2"){
-		if(values["MOMENTUM_DIST_TYPE"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
+		if(values["MOMENTUM_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
 		parseVector(values["MOMENTUM_PREF_DIR"], momentum_dir);
 	}
 

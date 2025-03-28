@@ -38,6 +38,7 @@ int main() {
     double *binmax = new double[9];
     double *binmin = new double[9];
     double *fieldiag = new double[6];
+    double *pos_dir = new double[3];
     double *mom_dir = new double[3];
     double *spin_dir = new double[3];
     int RR = 0;
@@ -54,7 +55,7 @@ int main() {
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -71,7 +72,7 @@ int main() {
     // Create the particle array
     Particle* particles = new Particle[particle_number];  // Array of pointers
 
-    createParticles(particles, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, lasers, laser_number);
+    createParticles(particles, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, lasers, laser_number);
 
     int* followed_particles;
     int number_follow_particles = 0;
@@ -224,6 +225,7 @@ int main() {
     delete[] binmin;
     delete[] bin_n;
     delete[] fieldiag;
+    delete[] pos_dir;
     delete[] mom_dir;
     delete[] spin_dir;
 
