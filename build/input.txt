@@ -1,20 +1,21 @@
 INPUT VALUES
 
 TIME_STEP=            	0.1 s
-TOTAL_TIME=  			0.09  s
-STEPS_DIAG=             0
+TOTAL_TIME=  			10  s
+STEPS_DIAG=             1
 
 		  PARTICLES
 
-NUMBER_OF_PARTICLES=  	300
+NUMBER_OF_PARTICLES=  	1
 POSITION_DIST_TYPE=     0
 POSITION_DIST_SIZE=     5
 MOMENTUM_DIST_TYPE=     0
 MOMENTUM_DIST_SIZE=     5
-MOMENTUM_PREF_DIR=      0,0,0
+MOMENTUM_PREF_DIR=      1,0,0
 SPIN_DIST_TYPE=         2
 SPIN_PREF_DIR=          1,1,-1
 SPIN_DIST_SIZE=         100
+RADIATION_REACTION=		1
 
 
          DIAGNOSTICS
@@ -35,20 +36,11 @@ FIELD_BIN_MAX=          20
 FIELD_BIN_DIR=          1
 
 		   LASERS
-L1=						3
+L1=						0
 K1=						1,0,0
-E1=						0,0,0
+E1=						0,1,0
 B1=						
 FREQ1= 					
 ENV_FREQ1=				1
 ENV_L1=                 5
 PHASE1=                 0
-
-La2=					3
-K2=						1,0,0
-E2=						0,0,0.70710678118
-B2=						
-FREQ2= 					
-ENV_FREQ2=				1
-ENV_L2=                 125
-PHASE2=                 1

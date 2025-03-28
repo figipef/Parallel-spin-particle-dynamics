@@ -6,6 +6,8 @@
 
 double MASS = 1; 
 double CHARGE = 1;
+double omega0 = 1;
+double C = 1;
 double G = 1; // hum whats this one? idk
 double a = 0.00116; //anomalous magetic moment
 
@@ -40,6 +42,37 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	delete[] ucE;
 
 	return Om;
+}
+
+double* f_RR(double gamma, double u[3], double E[3], double B[3]){
+	double dotB_u = inner(B, u);
+	double dotE_u = inner(E,u);
+ 	double b2 = inner(B, B);
+	double* crossB_E = cross(B,E);
+	double sigma0 = (2*omega0*CHARGE*CHARGE)/(3*MASS*C*C*C);
+
+	// defining F^2u
+	double F2_u[3]; 
+	for (int i = 0; i<3; i++){
+		F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
+	}  
+
+	// (u | F^2 u)
+	double dotu_F2u = -inner(u,F2_u);
+	// (u | F^2 u)u
+	double spatial_result[3];
+	for (int i = 0; i<3; i++){
+		spatial_result[i] = F2_u[i] - dotu_F2u * u[i];
+	} 
+
+	double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
+	double* result = new double[3];
+    for (int i = 0; i < 3; i++) {
+        result[i] = factor * spatial_result[i];
+    }
+    
+    return result;
+
 }
 
 // Creates a histogram based on the Diagnostics specified before
@@ -124,6 +157,7 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 
 void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
 	//std::cout << time<<" "<<n_of_particles<<"\n";
+
 	for (int i = 0; i < n_of_particles; ++i) {
 
 		double E_field[3] = {0,0,0};
@@ -155,11 +189,19 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 			delete[] fields;
 		}
 
+		double p_momentum_copy[3];
+		p_momentum_copy[0] = p_momentum[0];
+		p_momentum_copy[1] = p_momentum[1];
+		p_momentum_copy[2] = p_momentum[2];
+
+		double* f_RR_Value = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
+	
 		// 1st E half-step
 		double u_minus[3];
+	
 		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
-		}
+			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
+		};
 
         // auxiliary vector t
         double t_vec[3];
@@ -191,8 +233,8 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
         // 2nd E half-step
         double u_next[3];
         for (int j = 0; j < 3; ++j) {
-            u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
-        }
+			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
+		}
         
         // Update the particle's momentum
 		p.setMomentum(u_next);
@@ -485,7 +527,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -508,6 +550,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
 
     // Save the input values to usable variables
 
+	RR = std::stoi(values["RADIATION_REACTION"]);
     particle_n = std::stoi(values["NUMBER_OF_PARTICLES"]);
     timestep = std::stod(values["TIME_STEP"]);
     totaltime = std::stod(values["TOTAL_TIME"]);

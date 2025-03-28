@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
     double *fieldiag = new double[6];
     double *mom_dir = new double[3];
     double *spin_dir = new double[3];
+    int RR;
     int n_par = 0;
     int* bin_n = new int[9];
 
@@ -52,7 +53,7 @@ int main(int argc, char** argv) {
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -126,6 +127,7 @@ int main(int argc, char** argv) {
         } else { // Normal Boris run
 
             boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number);
+
         }
 
         // Following the information on particle 0
