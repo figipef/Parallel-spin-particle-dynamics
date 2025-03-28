@@ -68,9 +68,9 @@ Edit `build/input.txt` to modify the simulation parameters
  1 -> Gaussian distribution
  2 -> Static (`MOMENTUM_PREF_DIR`)
 
-`SPIN_DIST_TYPE`:
- 0 -> Uniform distribution (UNIT NORM)
- 1 -> Static (`SPIN_PREF_DIR`)
+`SPIN_DIST_TYPE`:(ALL WITH UNIT NORM)
+ 0 -> Uniform distribution 
+ 1 -> Static (`SPIN_PREF_DIR`) 
  2 -> Von Miser-Fisher (Central direction `SPIN_PREF_DIR`; kappa `SPIN_DIST_SIZE`)
 
 `SPIN_PREF_DIR`:

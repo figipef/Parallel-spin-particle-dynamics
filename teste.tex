@@ -1,0 +1,99 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts,a4wide}
+
+
+\usepackage[english,portuges]{babel}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+
+\renewcommand{\familydefault}{cmss}
+
+\newcommand{\cX}{\mathfrak{X}}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbQ}{\mathbb{Q}}
+\newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\sen}{\operatorname{sen}}
+\newcommand{\cotg}{\operatorname{cotg}}
+\newcommand{\cosec}{\operatorname{cosec}}
+\newcommand{\inte}{\operatorname{int}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\spane}{\operatorname{span}}
+\newcommand{\grad}{\operatorname{grad}}
+
+% Redefining the subsections to use just letters
+\renewcommand{\thesubsection}{\normalsize (\alph{subsection})}
+
+
+% Creating a solution separator
+\newcommand{\solution}{\par\noindent\rule{\textwidth}{0.4pt} Solu\c{c}\~ao:}
+
+
+\begin{document}
+
+\pagestyle{empty}
+
+\renewcommand{\arraystretch}{1.5}
+
+\begin{center}
+{\huge Geometria Riemanniana}\\
+\vspace{1cm}
+{\Large Ficha 5}\\
+\vspace{.5cm}
+{\em Entregar at\'e 26 de Mar\c{c}o}
+\vspace{.5cm}
+
+Your name, your ist number
+
+\end{center}
+
+\bigskip
+\bigskip
+
+\begin{enumerate}
+
+\item
+Dadas as formas diferenciais
+\begin{align*}
+& \alpha = xdy \in \Omega^1(\bbR^2)\\
+& \beta = -\frac{y}{x^2+y^2}dx+\frac{x}{x^2+y^2}dy \in \Omega^1(\bbR^2 \setminus \{ 0 \})\\
+& \omega = e^{y} dx + \cos z \, dy + y^2 dz \in \Omega^1(\bbR^3)\\
+& \eta = z dx \wedge dy - y dx \wedge dz + x dy \wedge dz \in \Omega^2(\bbR^3)\\
+& \zeta = dx^1 \wedge dx^2 + \ldots + dx^{2n-1} \wedge dx^{2n} \in \Omega^2(\bbR^{2n})
+\end{align*}
+e as aplica\c{c}\~oes diferenci\'aveis
+\begin{eqnarray*}
+f:\bbR \to \bbR^2 \qquad & g:\left]0,+\infty\right[ \times \left]0,2\pi\right[ \to \bbR^2 \qquad & h: \bbR^3 \to \bbR^3 \\
+f(t)=(t,t^2) \qquad & g(r,\theta)=(r\cos \theta, r \sen \theta) \qquad & h(u,v,w)=(uv,vw,uw)
+\end{eqnarray*}
+calcule:
+\subsection{}
+$\alpha \wedge \beta, \,\, \beta \wedge \beta, \,\, \omega \wedge \eta, \,\, \eta \wedge \eta$;
+\solution
+\subsection{}
+$\zeta \wedge \ldots \wedge \zeta$ (produto exterior com $n$ fatores);
+\solution
+\subsection{}
+$d\alpha, d\beta, d\omega, d\eta, d\zeta$;
+\solution
+\subsection{}
+$f^* \alpha, \,\, g^* \alpha, \,\, g^* \beta, \,\, h^* \eta$;
+\solution
+\subsection{}
+$g^* d\alpha, \,\, h^* d\eta$.
+\solution
+Olá esteves
+\begin{equation*}
+    E=mc^2+\text{AI}
+\end{equation*}
+
+\end{enumerate}
+\end{document}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
