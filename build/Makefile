@@ -9,6 +9,7 @@ SRCDIR := $(ROOTDIR)/src
 BINDIR := $(ROOTDIR)/build
 INCDIR := $(ROOTDIR)/inc
 OBJDIR := $(BUILDDIR)/obj
+OUTDIR := $(ROOTDIR)/output
 
 # Files
 SOURCES := $(wildcard $(SRCDIR)/*.cpp) #$(wildcard $(INCDIR)\chi2/*.cpp)
@@ -45,7 +46,7 @@ $(OBJDIR):
 
 # Clean
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET) $(OUTDIR)
 
 # Phony targets
 .PHONY: all clean
