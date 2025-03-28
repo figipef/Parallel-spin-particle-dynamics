@@ -253,8 +253,6 @@ def plot_hists_txt(ax, file_name, variables, time_val):
     
     full_path = os.path.abspath(file_name)
     data = load_histogram_data(full_path)
-
-    print(data)
     
     if not data:
         raise ValueError("No data found in the file.")

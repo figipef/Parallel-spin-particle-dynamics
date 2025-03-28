@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 #v = R.read_output("../output/e_field.txt")
 #w = R.read_output("../output/position.txt")
 #z = R.read_output("../output/spin.txt")
+
 #p = R.read_output("../output/momentum.txt")
 s = R.read_output("../output/lots_spin.txt")
-
 
 #print(v)
 #print('-----------------------------')
@@ -21,7 +21,7 @@ d = R.read_input("../build/input.txt")
 
 #P.plot_lots_v_time([w[:,0], w[:,1], w[:,2]], d['TIME_STEP'], Title="Position vs time", ylabel="Change in Position ($\Delta x$)", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([w[:, 0], w[:, 1], w[:, 2]])*1.1,np.max([w[:, 0]-w[:,0][0], w[:, 1], w[:, 2]])*1.1)), labels=["x", "y", "z"])
 
-#P.plot_lots_v_time([p[:,0], p[:,1], p[:,2]], d['TIME_STEP'], Title="Momentum vs time", ylabel="Momentum", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([p[:, 0], p[:, 1], p[:, 2]])*1.1,np.max([p[:, 0], p[:, 1], p[:, 2]])*1.1)), labels=["px", "py","pz"])
+P.plot_lots_v_time([p[:,0], p[:,1], p[:,2]], d['TIME_STEP'], Title="Momentum vs time", ylabel="Momentum", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([p[:, 0], p[:, 1], p[:, 2]])*1.1,np.max([p[:, 0], p[:, 1], p[:, 2]])*1.1)), labels=["px", "py","pz"])
 
 #P.plot_lots_v_time([z[:,0], z[:,1], z[:,2]], d['TIME_STEP'], Title="Spin vs time", ylabel="Spin", Grid=False, Lims=((0.,d['TOTAL_TIME']),(-1.5,1.5)), labels=["sx", "sy", "sz"])
 
@@ -81,10 +81,10 @@ def histogram_caller(input_file_path): #input file path
     VAR1 = np.array([d["PAR1"],d["PAR2"]])
     time_step_1 = d["TIME_STEP"]
 
-    #P.plot_hists_through_time(VAR1, time_step_1)
+    P.plot_hists_through_time(VAR1, time_step_1)
 
     VAR2 = np.array(['p1'])
-    P.plot_hists_through_time(VAR2,time_step_1)
+    #P.plot_hists_through_time(VAR2,time_step_1)
 
     VAR3 = np.array(["E2"])
     #P.plot_field_hists(VAR3)

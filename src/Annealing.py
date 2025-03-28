@@ -13,7 +13,7 @@ def plot_parts(parts, title, name):
     plt.show()
 
 
-iter = 500
+iter = 2500
 k = 0.01
 N = 8
 R = 1.
@@ -31,7 +31,7 @@ for i in range(iter):
     if i == 100:
         print(i)
         plot_parts(parts, "Configuration at t = 100", r'C:\Users\afons\Desktop\Tópicos FC\homeworks\Annealing\2.png')
-    if i == 200:
+    if i == 500:
         print(i)
         plot_parts(parts, "Configuration at t = 500", r'C:\Users\afons\Desktop\Tópicos FC\homeworks\Annealing\3.png')
     E_new = 0.
@@ -60,4 +60,4 @@ for i in range(iter):
     else:
         E_old = E_new
 
-plot_parts(parts, "Configuration at t = 1500", r'C:\Users\afons\Desktop\Tópicos FC\homeworks\Annealing\4.png')
+plot_parts(parts, "Configuration at t = 2500", r'C:\Users\afons\Desktop\Tópicos FC\homeworks\Annealing\4.png')

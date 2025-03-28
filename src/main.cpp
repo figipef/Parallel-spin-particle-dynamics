@@ -39,6 +39,7 @@ int main() {
     double *fieldiag = new double[6];
     double *mom_dir = new double[3];
     double *spin_dir = new double[3];
+    int RR;
     int n_par = 0;
     int* bin_n = new int[9];
 
@@ -50,7 +51,7 @@ int main() {
     int laser_number;
 
     // Setup the variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR);
 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); // Save the diagnostics to a struct for easier usage
 
@@ -86,13 +87,13 @@ int main() {
 
             Histogram hist = createHistogram(n_par, bin_n);
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number, &hist, &diag_params);
+            boris(particles,lasers, t, time_step, particle_number, laser_number, RR, &hist, &diag_params);
             
             writeDiagnosticsToFile(hist, counter, t);
 
         } else { // Normal Boris run
 
-            boris(particles,lasers, t, time_step, particle_number, laser_number);
+            boris(particles,lasers, t, time_step, particle_number, laser_number, RR);
         }
         
         for (double x =0; x <=20;x = x + 1){
@@ -153,7 +154,7 @@ int main() {
     int iter = 30;
     FieldDiagWritter(dt, iter, fieldiag, lasers, laser_number);
 
-    int N = 10000;
+    int N = particle_number;
     std::ofstream file_lots_spin("../output/lots_spin.txt");
     for (int n = 0; n < N; n++){
         writeToFile(file_lots_spin, particles[n], 's');
