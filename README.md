@@ -5,7 +5,18 @@ A high-performance simulation of a charged particle under electromagnetic fields
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Configuration](#configuration)
+- [Configuration](#configuration)  
+  - [General Simulation Parameters](#general-simulation-parameters)  
+  - [Particle Creation Parameters](#particle-creation-parameters)  
+    - [Parameter Description](#parameter-description)  
+    - [Parameter Options](#parameter-options)  
+    - [Distribution Sizes](#distribution-sizes)  
+  - [Diagnostics Parameters](#diagnostics-parameters)  
+    - [Parameter Description](#parameter-description-1)  
+    - [Parameter Options](#parameter-options-1)  
+  - [Laser Parameters](#laser-parameters)  
+    - [Parameter Description](#parameter-description-2)  
+    - [Parameter Options](#parameter-options-2)  
 - [Authors](#authors)
 
 ## Installation
@@ -44,6 +55,10 @@ Edit `build/input.txt` to modify the simulation parameters
 `TIME_STEP` is the normalized time between iterations
 `TOTAL_TIME` is the normalized duration of the simulation
 `STEPS_DIAG` is the number of timesteps between the writing of diagnostics (if it is 0 then no recording will be done)
+`RADIATION_REACTION` is a `0` or a `1` to select if the user wants to take into account the radiation reaction effects
+`FOLLOW_PARTICLE` is a `0` or a `1` to select if the user wants to get the position, momentum and spin of particles during the whole simulation
+`RANDOM_PARTICLE` is a `0` or a `1` to select if the user wants to follow a predetermined one or random particles, respectively.
+`PARTICLE_NUMBER` is either the particle index that the user wants to follow, or the number of random particles that should be followed
 
 ### Particle Creation Parameters
 
@@ -62,6 +77,7 @@ Edit `build/input.txt` to modify the simulation parameters
 `POSITION_DIST_TYPE`:
  0 -> Uniform distribution
  1 -> Gaussian distribution
+ 2 -> Static (`POSITION_PREF_DIR`) 
 
 `MOMENTUM_DIST_TYPE`:
  0 -> Uniform distribution
@@ -73,8 +89,8 @@ Edit `build/input.txt` to modify the simulation parameters
  1 -> Static (`SPIN_PREF_DIR`) 
  2 -> Von Miser-Fisher (Central direction `SPIN_PREF_DIR`; kappa `SPIN_DIST_SIZE`)
 
-`SPIN_PREF_DIR`:
- Should be written like: `X,Y,Z` where X,Y,Z can be any double
+`*_PREF_DIR`:
+ Should be written like: `X,Y,Z` where X,Y and Z can be any double.
 
 #### Distribution Sizes
 
