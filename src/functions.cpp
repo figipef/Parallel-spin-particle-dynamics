@@ -50,7 +50,8 @@ double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
     double dotB_u = inner(B, u);
     double dotE_u = inner(E, u);
     double b2 = inner(B, B);
-    
+    double e2 = inner(E, E);
+
     double* crossB_E = cross(B, E);  // Ensure `cross` dynamically allocates memory
 
     double sigma0 = (2 * omega0 * CHARGE * CHARGE) / (3 * MASS * C * C * C);
@@ -58,10 +59,10 @@ double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
     // F^2 * u
     double F2_u[3]; 
     for (int i = 0; i < 3; i++) {
-        F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
+        F2_u[i] = dotE_u * E[i] + B[i] * dotB_u - b2 * u[i] - crossB_E[i]*gamma;
     }
 
-    double dotu_F2u = inner(u, F2_u);
+    double dotu_F2u = -inner(u, F2_u) + gamma*gamma*e2 + (inner(crossB_E, u))*gamma;
 
     double spatial_result[3];
     for (int i = 0; i < 3; i++) {
@@ -69,7 +70,7 @@ double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
     } 
 
     double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
-	std::cout <<factor <<"\n";
+	//std::cout <<factor <<"\n";
     double* result = new double[3];
     
     for (int i = 0; i < 3; i++) {
