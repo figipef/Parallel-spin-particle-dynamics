@@ -28,7 +28,7 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 
 	// Check for nullptr before accessing data
 	if (data) {
-		
+
 	    for (int i = 0; i < 3; i++) {
 	        file << data[i] << " ";
 	    }
@@ -43,7 +43,7 @@ void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t
 
 	std::ostringstream filename_temp;
 
-	filename_temp << "../output/histogram" << std::setw(10) << std::setfill('0') << iter;  // 8 digits with leading zeros
+	filename_temp << "../output/histogram" << std::setw(10) << std::setfill('0') << iter;  // 10 digits with leading zeros
 
 	std::string filename = filename_temp.str() + ".txt";
 
@@ -100,7 +100,7 @@ void printProgressBar(int progress, int total, int barWidth) {
   float percent = (float)progress / total;
   int filled = percent * barWidth;
 
-  std::cout << "\r[";
+  std::cout << "\r Simulation progress: [";
   for (int i = 0; i <= barWidth; i++) {
       if (i < filled)
           std::cout << "=";

@@ -58,7 +58,7 @@ Edit `build/input.txt` to modify the simulation parameters
 `RADIATION_REACTION` is a `0` or a `1` to select if the user wants to take into account the radiation reaction effects
 `FOLLOW_PARTICLE` is a `0` or a `1` to select if the user wants to get the position, momentum and spin of particles during the whole simulation
 `RANDOM_PARTICLE` is a `0` or a `1` to select if the user wants to follow a predetermined one or random particles, respectively.
-`PARTICLE_NUMBER` is either the particle index that the user wants to follow, or the number of random particles that should be followed
+`PARTICLE_NUMBER` is either the particle index that the user wants to follow, or the number of random particles that should be followed (MAX 100)
 
 ### Particle Creation Parameters
 
