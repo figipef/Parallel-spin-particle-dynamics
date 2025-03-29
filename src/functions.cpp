@@ -61,7 +61,7 @@ double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
         F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
     }
 
-    double dotu_F2u = -inner(u, F2_u);
+    double dotu_F2u = inner(u, F2_u);
 
     double spatial_result[3];
     for (int i = 0; i < 3; i++) {
@@ -69,7 +69,7 @@ double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
     } 
 
     double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
-	
+	std::cout <<factor <<"\n";
     double* result = new double[3];
     
     for (int i = 0; i < 3; i++) {
