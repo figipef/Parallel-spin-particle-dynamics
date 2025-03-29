@@ -326,11 +326,6 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		delete[] sct;
 		delete[] scs;
 		delete[] Om;
-
-		if (RR = 1){ // Delete the Radiation reaction if it was assign a dynamically allocated array
-			delete[] f_RR_Value_before;
-			delete[] f_RR_Value_after;
-		}
     }
 }
 
@@ -903,7 +898,6 @@ void setupFollowParticles(int* follow_params,std::ofstream* file_pos, std::ofstr
             for (int i = 0; i < number_follow_particles; i++){
 
                 followed_particles[i] = dis(gen);
-                std::cout << followed_particles[i] << "\n";
                 
                 file_pos[i].open("../output/position" + std::to_string(followed_particles[i]) + ".txt");
                 file_mom[i].open("../output/momentum" + std::to_string(followed_particles[i]) + ".txt");
@@ -925,7 +919,7 @@ void setupFollowParticles(int* follow_params,std::ofstream* file_pos, std::ofstr
 
         } else {
 
-            std::cout <<"smth is wrong with following \n";
+            std::cout <<"2nd following parameter wrong \n";
         }
     }
 }
