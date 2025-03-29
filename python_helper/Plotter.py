@@ -28,14 +28,15 @@ def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #t
     plt.grid(Grid)
     plt.show()
 
-def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0, labels = ["x", "y"]): #takes and array q of some quantity and the time step between values and plots the data
+def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
     n = len(x)
     t = np.linspace(dt, dt*n, n)
 
     plt.figure(figsize=(8,5))
-    plt.scatter(x, y, c=t, cmap='copper_r', marker='o', s=1)
-
-    plt.colorbar(label='t [$1/\omega_0$]')
+    sc = plt.scatter(x, y, c=t, cmap='copper_r', marker='o', s=1)
+    cbar = plt.colorbar(sc)
+    cbar.set_label('Time [$1/\omega_0$]', fontsize=16)
+    cbar.ax.tick_params(labelsize=14)    
 
     plt.xlabel('x [$c/\omega_0$]', fontsize=16)
     plt.ylabel('y [$c/\omega_0$]', fontsize=16)
@@ -47,6 +48,13 @@ def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0, labels = ["x", "y"
     if isinstance(Lims, (list, tuple)):
         plt.xlim((Lims[0][0], Lims[0][1]))
         plt.ylim((Lims[1][0], Lims[1][1]))
+    
+    cmap = plt.get_cmap("copper_r")
+    norm = plt.Normalize(t.min(), t.max())
+    for i in range(1, 10):
+        ind = i*int(n/10)
+        arrow_color = cmap(norm(t[ind]))
+        plt.annotate("", xy=(x[ind], y[ind]), xytext=(x[ind - 1], y[ind - 1]), arrowprops=dict(arrowstyle="->", color=arrow_color, linewidth=2,mutation_scale=25))
 
     plt.grid(Grid)
     plt.show()
@@ -69,10 +77,16 @@ def plot_lots_2D_traj(x_arr, y_arr, dt, Title = "", Grid = True, Lims = 0):
         plt.ylim((Lims[1][0], Lims[1][1]))
 
     plt.grid(Grid)
-
+    norm = plt.Normalize(t.min(), t.max())
     cmaps = ['copper_r','Blues', 'Oranges', 'Greens', 'Purples', 'Reds', 'Greys', 'YlOrBr', 'OrRd']
-    for i in range(N):
-        plt.scatter(x_arr[i], y_arr[i], c=t, cmap=cmaps[i % len(cmaps)], marker='o', s=1)
+    for j in range(N):
+        plt.scatter(x_arr[j], y_arr[j], c=t, cmap=cmaps[j % len(cmaps)], marker='o', s=1)
+        cmap = plt.get_cmap(cmaps[j])
+        for i in range(1, 10):
+            ind = i*int(n/10)
+            arrow_color = cmap(norm(t[ind]))
+            plt.annotate("", xy=(x_arr[j][ind], y_arr[ind]), xytext=(x_arr[ind - 1], y_arr[ind - 1]), arrowprops=dict(arrowstyle="->", color=arrow_color, linewidth=2,mutation_scale=25))
+
 
     plt.show()
 
@@ -104,36 +118,35 @@ def plot_3D_traj(x, y, z, dt, Title = "", Lims = 0): #takes and array q of some 
 
     plt.show()
 
-    def plot_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
+def plot_lots_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
+    N = len(x_arr)  # Number of trajectories
+    n = len(x_arr[0])  # Number of data points per trajectory
+    t = np.linspace(dt, dt * n, n)  # Time array
 
-        N = len(x_arr)  # Number of trajectories
-        n = len(x_arr[0])  # Number of data points per trajectory
-        t = np.linspace(dt, dt * n, n)  # Time array
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-
-        cmaps = ['copper_r', 'Blues', 'Oranges', 'Greens', 'Purples', 'Reds', 'Greys', 'YlOrBr', 'OrRd']
+    cmaps = ['copper_r', 'Blues', 'Oranges', 'Greens', 'Purples', 'Reds', 'Greys', 'YlOrBr', 'OrRd']
     
-        for i in range(N):
-            ax.scatter(x_arr[i], y_arr[i], z_arr[i], c=t, cmap=cmaps[i % len(cmaps)], marker='o', s=1)
-        
-        ax.set_xlabel('x [$c/\omega_0$]', fontsize=16)
-        ax.set_ylabel('y [$c/\omega_0$]', fontsize=16)
-        ax.set_zlabel('z [$c/\omega_0$]', fontsize=16)
-        ax.set_title(Title, fontsize=18)
+    for i in range(N):
+        ax.scatter(x_arr[i], y_arr[i], z_arr[i], c=t, cmap=cmaps[i % len(cmaps)], marker='o', s=1)
+      
+    ax.set_xlabel('x [$c/\omega_0$]', fontsize=16)
+    ax.set_ylabel('y [$c/\omega_0$]', fontsize=16)
+    ax.set_zlabel('z [$c/\omega_0$]', fontsize=16)
+    ax.set_title(Title, fontsize=18)
 
-        ax.tick_params(axis='both', labelsize=14)
+    ax.tick_params(axis='both', labelsize=14)
 
-        if isinstance(Lims, (list, tuple)) and len(Lims) == 3:
-            ax.set_xlim(Lims[0])
-            ax.set_ylim(Lims[1])
-            ax.set_zlim(Lims[2])
-        else:
-            if Lims != 0:
-                print("Ignored limit indications due to incorrect data type being provided\n")
+    if isinstance(Lims, (list, tuple)) and len(Lims) == 3:
+        ax.set_xlim(Lims[0])
+        ax.set_ylim(Lims[1])
+        ax.set_zlim(Lims[2])
+    else:
+        if Lims != 0:
+            print("Ignored limit indications due to incorrect data type being provided\n")
 
-        plt.show()
+    plt.show()
 
 
 def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"]): #takes and array of arrays q of some quantities and the time step between values and plots the data
