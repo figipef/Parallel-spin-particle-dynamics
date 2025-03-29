@@ -208,6 +208,8 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		        u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_before[j];
 		    }
 
+		    delete[] f_RR_Value_before;
+
 		} else if (RR == 0) {
 
 		    for (int j = 0; j < 3; ++j) {
@@ -256,6 +258,8 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		    for (int j = 0; j < 3; ++j) {
 		        u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_after[j];
 		    }
+
+		    delete[] f_RR_Value_after;
 
 		} else if (RR == 0) {
 
