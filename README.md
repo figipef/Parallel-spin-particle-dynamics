@@ -87,7 +87,7 @@ Edit `build/input.txt` to modify the simulation parameters
 `SPIN_DIST_TYPE`:(ALL WITH UNIT NORM)
  0 -> Uniform distribution 
  1 -> Static (`SPIN_PREF_DIR`) 
- 2 -> Von Miser-Fisher (Central direction `SPIN_PREF_DIR`; kappa `SPIN_DIST_SIZE`)
+ 2 -> Von Miser-Fisher (Central direction `SPIN_PREF_DIR`; Angular spread parameter, kappa `SPIN_DIST_SIZE`)
 
 `*_PREF_DIR`:
  Should be written like: `X,Y,Z` where X,Y and Z can be any double.
