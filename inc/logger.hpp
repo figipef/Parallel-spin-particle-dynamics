@@ -35,7 +35,7 @@ public:
                 
                 if (lasers[i].type >= 2 && lasers[i].ext_phase != 0){
 
-                    std::cout << "    Laser extra phase:" << lasers[i].ext_phase<<"π\n";
+                    std::cout << "    Laser extra phase: " << lasers[i].ext_phase<<" π\n";
                 }
                 std::cout <<"\n";
             }
