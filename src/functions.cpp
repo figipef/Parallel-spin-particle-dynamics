@@ -36,7 +36,7 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	double* ucE = cross(u, E); //u cross E
 	double udB = inner(u, B); // u dot B
 	for (int i = 0; i < 3; i++){
-		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
+		Om[i] = -((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
 
 	delete[] ucE; 
