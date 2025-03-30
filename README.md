@@ -99,7 +99,7 @@ Edit `build/input.txt` to modify the simulation parameters
 2. Gaussian distribution:
 	`*_DIST_SIZE` corresponds to the standard deviation. No particles are created with a `*` variable over 3 standard deviations.
 3. Von Miser-Fisher:
-	kappa? AFONSO PLS HELP
+	`*_DIST_SIZE` corresponds to the concentration parameter, kappa, of this distribution. Greater kappa means random spin direction are closer to the central direction.
 
 ### Diagnostics Parameters
 
