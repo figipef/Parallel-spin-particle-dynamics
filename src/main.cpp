@@ -1,15 +1,31 @@
 #include "particle.hpp"
 #include "functions.hpp"
 #include "laser.hpp"
+#include "logger.hpp"
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <chrono>
 
-int main() {
+int main(int argc, char* argv[]) {
 
+    // ============================
+    //   VERBOSITY INTIALIZATION
+    // ============================
+
+    int verbosity = 0; // Default verbosity level
+
+    if (argc > 1) {
+        verbosity = std::atoi(argv[1]); // Convert argument to integer
+    }
+
+    Logger logger(verbosity);
+
+    logger.log(0,"\n[0] Starting Program \n");
 
     // ============================
     //   VARIABLE INTIALIZATION
@@ -61,6 +77,10 @@ int main() {
     //       SIMULATION SETUP
     // ============================
 
+    // Start the setup timer
+    auto time_setup = std::chrono::high_resolution_clock::now();
+
+    logger.log(1,"\n [1] Reading Input File \n");
 
     std::ifstream input_file("input.txt"); // Open the input file
 
@@ -69,13 +89,21 @@ int main() {
     // Setup ALL the input file variables
     setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
 
-    Particle* particles = new Particle[particle_number];  // Create the particle array
+    logger.logLasers(3, lasers, laser_number);
 
     // Save the diagnostics to a struct for easier usage 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); 
 
+    logger.logDiag(3, diag_params); 
+
+    Particle* particles = new Particle[particle_number];  // Create the particle array
+
+    logger.log(1,"\n [1] Creating Particle Array \n");    
+
     // Create the particles according to input parameters
     createParticles(particles, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, lasers, laser_number);
+
+    logger.log(2,"\n  [2] Setting up followed particles \n"); 
 
     // Create the files and save the necessary variables to follow particles
     setupFollowParticles(follow_params, file_pos, file_mom, file_spn, followed_particles, number_follow_particles, particle_number);
@@ -83,6 +111,11 @@ int main() {
     // ============================
     //     MAIN LOOP CODE BLOCK
     // ============================
+
+    // Start the Loop timer
+    auto time_loop = std::chrono::high_resolution_clock::now();
+
+    logger.log(1,"\n [1] Starting Simulation \n");    
 
     int counter = 0; // Counter for the diagnostics file numbering
 
@@ -118,10 +151,15 @@ int main() {
 
         counter++;
     }
+    std::cout <<"\n";
 
+    // Finish the Loop timer
+    auto time_loop_end = std::chrono::high_resolution_clock::now();
+
+    logger.log(1,"\n [1] Successfully Finished Simulation \n");
+
+    logger.log(2,"\n  [2] Writing Fields Diagnostics (If selected) \n");
     FieldDiagWritter(time_step, counter, fieldiag, lasers, laser_number);
-
-    std::cout <<"\nshould be finished\n";
 
     //  Clean the Dinamically allocated memory
 
@@ -142,6 +180,14 @@ int main() {
 
     delete[] follow_params;
     delete[] followed_particles;
+
+    auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop - time_setup);
+    auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop_end - time_loop);
+
+    logger.log(2,"\n  [2] Setup took " + std::to_string(duration1.count()/1000.) + " seconds \n");
+    logger.log(2,"\n  [2] Simulation took " + std::to_string(duration2.count()/1000.) + " seconds \n");
+
+    logger.log(0,"\n[0] Successfully Finished Running \n");
 
 	return 0;
 }
