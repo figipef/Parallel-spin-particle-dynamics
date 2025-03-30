@@ -8,12 +8,11 @@
 
 class Laser
 {
-private:
-
-	double e_0[3]; // Eletric field vector
-	double b_0[3]; // Magnetic field vector
 
 public:
+	
+	double e_0[3]; // Eletric field vector
+	double b_0[3]; // Magnetic field vector
 	double k[3]; // Wave vector
 	double freq; // frequency calculated from wave vector
 	double length; // length of the envelope

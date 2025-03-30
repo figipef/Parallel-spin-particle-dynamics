@@ -100,7 +100,7 @@ void printProgressBar(int progress, int total, int barWidth) {
   float percent = (float)progress / total;
   int filled = percent * barWidth;
 
-  std::cout << "\r Simulation progress: [";
+  std::cout << "\r[0] Simulation progress: [";
   for (int i = 0; i <= barWidth; i++) {
       if (i < filled)
           std::cout << "=";

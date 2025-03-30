@@ -20,7 +20,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 $(info $(SRCDIR))
 
 # Program name
-PROGRAM_NAME := test.exe
+PROGRAM_NAME := simulation.exe
 
 # Target binary
 TARGET := $(BINDIR)/$(PROGRAM_NAME)
