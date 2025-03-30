@@ -148,6 +148,32 @@ def plot_lots_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
 
     plt.show()
 
+def plot_spin_sphere(s, dt, Title):
+    n = len(s.transpose()[0])
+    t = np.linspace(0., dt*n, n)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    sc = ax.scatter(s[:,0], s[:,1], s[:,2], c=t, cmap='copper_r', marker='o', s=1)
+    cbar = plt.colorbar(sc)
+    cbar.set_label('Time [$1/\omega_0$]', fontsize=16)
+    cbar.ax.tick_params(labelsize=14)    
+
+    ax.set_xlabel('sx Projection', fontsize=16)
+    ax.set_ylabel('sy Projection', fontsize=16)
+    ax.set_zlabel('sz Projection', fontsize=16)
+    ax.set_title(Title, fontsize=18)
+
+    phi = np.linspace(0, 2 * np.pi, 30)
+    th = np.linspace(0, np.pi, 30)
+    X = np.outer(np.cos(phi), np.sin(th))
+    Y = np.outer(np.sin(phi), np.sin(th))
+    Z = np.outer(np.ones_like(phi), np.cos(th))
+    ax.plot_surface(X, Y, Z, color='gray', alpha=0.2, edgecolor='none')
+
+    ax.tick_params(axis='both', labelsize=14)
+    plt.show()
 
 def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"]): #takes and array of arrays q of some quantities and the time step between values and plots the data
     N = len(Q)
