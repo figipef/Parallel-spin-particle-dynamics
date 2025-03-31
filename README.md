@@ -43,7 +43,13 @@ A high-performance simulation of a charged particle under electromagnetic fields
 
 Run the simulation using (in this case 8 processes):
 ```sh
-mpirun -np 8 ./teste_mpi
+mpirun -np 8 ./simulation_mpi.exe
+``` 
+
+Verbose options are `0`, `1`, `2`, `3` according to the user desire. It is `0` by default.
+To apply verbosity run, where the number after the executable defines de verbosity option:
+```sh
+mpirun -np 8 ./simulation_mpi.exe 1
 ``` 
 
 ## Configuration
