@@ -62,7 +62,7 @@ void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t
         	    outFile << bin << "\n";  // Each bin value on a new line
         	}
         	outFile.close();
-        	std::cout << "1D Histogram saved to " << filename << std::endl;
+        	std::cout << " 1D Histogram saved to " << filename << std::endl;
 
 		} else {
 
@@ -79,7 +79,7 @@ void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t
         	}
 
         	outFile.close();
-        	std::cout << "2D Histogram saved to " << filename << std::endl;
+        	std::cout << " 2D Histogram saved to " << filename << std::endl;
 		}
 
 	} else {

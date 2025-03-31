@@ -1,8 +1,8 @@
          INPUT VALUES
 
-TIME_STEP=            	0.1 s
-TOTAL_TIME=  			100  s
-STEPS_DIAG=             0
+TIME_STEP=            	0.001 s
+TOTAL_TIME=  			10  s
+STEPS_DIAG=             1000
 RADIATION_REACTION=		1
 FOLLOW_PARTICLE=        1
 RANDOM_PARTICLE=        1
@@ -10,9 +10,9 @@ PARTICLE_NUMBER=        4
 
 	PARTICLE INITALIZATION
 
-NUMBER_OF_PARTICLES=  	300
-POSITION_DIST_TYPE=     2
-POSITION_DIST_SIZE=     5
+NUMBER_OF_PARTICLES=  	100000
+POSITION_DIST_TYPE=     0
+POSITION_DIST_SIZE=     10
 POSITION_PREF_DIR=      0,0,0
 MOMENTUM_DIST_TYPE=     2
 MOMENTUM_DIST_SIZE=     5
@@ -23,14 +23,14 @@ SPIN_DIST_SIZE=         100
 
          DIAGNOSTICS
 
-PAR1=                   m1
-PAR2=                   m2					
+PAR1=                   p1
+PAR2=                   p2					
 BIN_NUMBER_1=           21
 BIN_NUMBER_2=           21 				
-BIN_MAX_1=              1
-BIN_MAX_2=              1              
-BIN_MIN_1=              -1
-BIN_MIN_2=              -1
+BIN_MAX_1=              100
+BIN_MAX_2=              100              
+BIN_MIN_1=              -100
+BIN_MIN_2=              -100
 SHOW_E=                 0
 SHOW_B=                 0
 FIELD_BIN=              0.1

@@ -615,9 +615,9 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
 	dist_types[2] = values["SPIN_DIST_TYPE"];
 
-	particle_params[0] = std::stoi(values["FOLLOW_PARTICLE"]);
-	particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
-	particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
+	//particle_params[0] = std::stoi(values["FOLLOW_PARTICLE"]);
+	//particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
+	//particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
 
 	if (dist_types[0] == "2"){
 		if(values["POSITION_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Position Selected But No Coordinates Indicated! Please Initialize It Correctly in Input");}}

@@ -15,6 +15,15 @@
 
 int main(int argc, char* argv[]) {
 
+    // ==================================
+    //    PARALELIZATION INITIALIZATION
+    // ==================================
+
+    MPI_Init(&argc, &argv);
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     // ============================
     //   VERBOSITY INTIALIZATION
     // ============================
@@ -28,7 +37,10 @@ int main(int argc, char* argv[]) {
 
     Logger logger(verbosity);
 
-    logger.log(0,"\n[0] Starting Program \n");
+    if (rank == 0){
+        logger.log(0,"\n[0] Starting Program \n");
+        logger.log(2,"\n [1] Setting up paralelization \n");
+    }
 
     // ============================
     //   VARIABLE INTIALIZATION
@@ -83,7 +95,7 @@ int main(int argc, char* argv[]) {
     // Start the setup timer
     auto time_setup = std::chrono::high_resolution_clock::now();
 
-    logger.log(1,"\n [1] Reading Input File \n");
+    if (rank == 0){logger.log(1,"\n [1] Reading Input File \n");}
 
     std::ifstream input_file("input.txt"); // Open the input file
 
@@ -92,42 +104,34 @@ int main(int argc, char* argv[]) {
     // Setup ALL the input file variables
     setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
 
-    logger.logLasers(3, lasers, laser_number);
+    if (rank == 0){logger.logLasers(3, lasers, laser_number);}
 
     // Save the diagnostics to a struct for easier usage 
     DiagnosticParameters diag_params(params, binsize, binmax, binmin, n_par); 
 
-    logger.logDiag(3, diag_params); 
+    if (rank == 0){logger.logDiag(3, diag_params); }
 
     Particle* particles = new Particle[particle_number];  // Create the particle array
 
-    logger.log(1,"\n [1] Creating Particle Array \n");    
+    if (rank == 0){logger.log(1,"\n [1] Creating Particle Array \n"); }   
 
     // Create the particles according to input parameters
     createParticles(particles, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, lasers, laser_number);
-
-    logger.log(2,"\n  [2] Setting up followed particles \n"); 
+    /*
+    if (rank == 0){logger.log(2,"\n  [2] Setting up followed particles \n"); }
 
     // Create the files and save the necessary variables to follow particles
     setupFollowParticles(follow_params, file_pos, file_mom, file_spn, followed_particles, number_follow_particles, particle_number);
 
-    // ==================================
-    //    PARALELIZATION INITIALIZATION
-    // ==================================
-
-    logger.log(2,"\n [1] Setting up paralelization \n"); 
-
-    MPI_Init(&argc, &argv);
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
+    // Ensure all processes receive the same followed_particles array
+    MPI_Bcast(followed_particles, number_follow_particles, MPI_INT, 0, MPI_COMM_WORLD);
+    */
     double start_time = MPI_Wtime(); // Performance Time check
 
+    // Division of particles for the processes
     int local_particle_count = particle_number / size;
     int start_idx = rank * local_particle_count;
     int end_idx = (rank == size - 1) ? particle_number : start_idx + local_particle_count;
-
 
     // ============================
     //     MAIN LOOP CODE BLOCK
@@ -136,13 +140,14 @@ int main(int argc, char* argv[]) {
     // Start the Loop timer
     auto time_loop = std::chrono::high_resolution_clock::now();
 
-    logger.log(1,"\n [1] Starting Simulation \n");    
+    if (rank == 0){logger.log(1,"\n [1] Starting Simulation \n");}    
 
     int counter = 0; // Counter for the diagnostics file numbering
 
     for (double t = 0; t <= total_time; t += time_step){
 
         if (rank == 0){
+
             printProgressBar(t, total_time, 50); // Dinamic progress bar printing
         }
         
@@ -153,7 +158,7 @@ int main(int argc, char* argv[]) {
             Histogram local_hist = createHistogram(n_par, bin_n);
             Histogram global_hist = createHistogram(n_par, bin_n);
 
-            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number, &local_hist, &diag_params);
+            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number, RR, &local_hist, &diag_params);
 
             int total_bins = (local_hist.is_matrix) ? (bin_n[0] * bin_n[1]) : bin_n[0];
 
@@ -167,25 +172,30 @@ int main(int argc, char* argv[]) {
             // Rank 0 reconstructs global histogram
             if (rank == 0) {
                 global_hist.from_flattened(global_flat, bin_n);
-                writeDiagnosticsToFile(global_hist, counter, t);
+                writeDiagnosticsToFile(global_hist, counter, t, params, n_par);
             }
 
         } else { // Normal Boris run
 
-            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number);
+            boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number, RR);
 
         }
-
+        /*
         if (follow_params[0] == 1){
 
             // Save write to the files the necessary particle information
 
             for (int i = 0; i < number_follow_particles; i++){
-                writeToFile(file_pos[i], particles[followed_particles[i]], 'p');
-                writeToFile(file_mom[i], particles[followed_particles[i]], 'm');
-                writeToFile(file_spn[i], particles[followed_particles[i]], 's');
+
+                if (followed_particles[i] < end_idx && followed_particles[i] >= start_idx){ // only write particles corresponding to each process
+
+                    writeToFile(file_pos[i], particles[followed_particles[i]], 'p');
+                    writeToFile(file_mom[i], particles[followed_particles[i]], 'm');
+                    writeToFile(file_spn[i], particles[followed_particles[i]], 's'); 
+                }
             }                
         }
+        */
 
         counter++;
     }
@@ -193,22 +203,21 @@ int main(int argc, char* argv[]) {
 
     // Calculate the time taken to process everything
 
+    auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop - time_setup);
+
     double end_time = MPI_Wtime();
     double elapsed_time = end_time - start_time;
     double max_time;
     MPI_Reduce(&elapsed_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
-        std::cout << "Max Execution Time across all processes: " << max_time << " seconds\n";
+
+        logger.log(2,"\n  [2] Setup took " + std::to_string(duration1.count()/1000.) + " seconds \n");
+        logger.log(2,"\n  [2] Simulation took " + std::to_string(max_time) + " seconds \n");
+
+        logger.log(0,"\n[0] Successfully Finished Running \n");     
     }
- 
-    auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop - time_setup);
-    auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop_end - time_loop);
 
-    logger.log(2,"\n  [2] Setup took " + std::to_string(duration1.count()/1000.) + " seconds \n");
-    logger.log(2,"\n  [2] Simulation took " + std::to_string(duration2.count()/1000.) + " seconds \n");
-
-    logger.log(0,"\n[0] Successfully Finished Running \n");
 
     delete[] lasers;
     delete[] particles;
@@ -224,5 +233,6 @@ int main(int argc, char* argv[]) {
     delete[] spin_dir;
 
     MPI_Finalize();
+
 	return 0;
 }

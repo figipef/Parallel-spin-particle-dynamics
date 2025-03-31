@@ -12,7 +12,7 @@ CXX := g++
 MPICXX := mpic++
 
 # Compiler flags
-CXXFLAGS := -std=c++14 -fsanitize=address,undefined -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2 -I$(INCDIR)
+CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2 -I$(INCDIR)
 
 # other flag to be considered -fsanitize=address,undefined
 
