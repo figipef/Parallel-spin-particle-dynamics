@@ -1,25 +1,25 @@
 import numpy as np
-import Reader as R
-import Plotter as P
+from python_helper import Reader as R
+from python_helper import Plotter as P
 import matplotlib.pyplot as plt
 
-#v = R.read_output("../output/e_field.txt")
-#w = R.read_output("../output/position.txt")
-#z = R.read_output("../output/spin.txt")
-p = R.read_output("../output/momentum.txt")
-#s = R.read_output("../output/lots_spin.txt")
+#v = R.read_output("output/e_field.txt")
+#w = R.read_output("output/position.txt")
+#z = R.read_output("output/spin.txt")
 
+#p = R.read_output("output/momentum.txt")
+s = R.read_output("output/lots_spin.txt")
 
 #print(v)
 #print('-----------------------------')
 #print(v[:,1])
 print('-----------------------------')
-d = R.read_input("../build/input.txt")
+d = R.read_input("build/input.txt")
 #print(d)
 
 #P.plot_v_time(v[:,0], d['TIME_STEP'], Title="TESTING", ylabel="I honestly forgor", Grid=False, Lims=((0.,15.),(-2,3)))
 
-#P.plot_lots_v_time([w[:,0]-w[:,0][0], w[:,1], w[:,2]], d['TIME_STEP'], Title="Position vs time", ylabel="Change in Position ($\Delta x$)", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([w[:, 0], w[:, 1], w[:, 2]])*1.1,np.max([w[:, 0]-w[:,0][0], w[:, 1], w[:, 2]])*1.1)), labels=["x", "y", "z"])
+#P.plot_lots_v_time([w[:,0], w[:,1], w[:,2]], d['TIME_STEP'], Title="Position vs time", ylabel="Change in Position ($\Delta x$)", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([w[:, 0], w[:, 1], w[:, 2]])*1.1,np.max([w[:, 0]-w[:,0][0], w[:, 1], w[:, 2]])*1.1)), labels=["x", "y", "z"])
 
 P.plot_lots_v_time([p[:,0], p[:,1], p[:,2]], d['TIME_STEP'], Title="Momentum vs time", ylabel="Momentum", Grid=True, Lims=((0.,d['TOTAL_TIME']),(np.min([p[:, 0], p[:, 1], p[:, 2]])*1.1,np.max([p[:, 0], p[:, 1], p[:, 2]])*1.1)), labels=["px", "py","pz"])
 
@@ -46,12 +46,14 @@ P.plot_lots_v_time([p[:,0], p[:,1], p[:,2]], d['TIME_STEP'], Title="Momentum vs 
 
 #plt.show()
 
-#sx = s[:,0]
-#sy = s[:,1]
-#sz = s[:,2]
+sx = s[:,0]
+sy = s[:,1]
+sz = s[:,2]
+print(s)
+
 fig = plt.figure(figsize=(8, 6))
 ax = fig.add_subplot(111, projection='3d')
-#ax.scatter(sx,sy,sz, s=1, c='blue', marker='o')
+ax.scatter(sx,sy,sz, s=1, c='blue', marker='o')
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
@@ -68,10 +70,11 @@ Z = np.outer(np.ones_like(u), np.cos(v))  # Z-coordinates
 ax.plot_surface(X, Y, Z, color='gray', alpha=0.2, edgecolor='none')
 
 # Show plot
-#plt.show()
+plt.show()
 
-#d = R.read_input("build/input.txt")
-#print(d)
+"""
+d = R.read_input("build/input.txt")
+print(d)
 
 def histogram_caller(input_file_path): #input file path
 
@@ -86,4 +89,4 @@ def histogram_caller(input_file_path): #input file path
     VAR3 = np.array(["E2"])
     #P.plot_field_hists(VAR3)
 
-histogram_caller(d)
+histogram_caller(d)"""

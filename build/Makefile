@@ -12,23 +12,20 @@ CXX := g++
 MPICXX := mpic++
 
 # Compiler flags
-CXXFLAGS := -std=c++14 -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2 -I$(INCDIR)
+CXXFLAGS := -std=c++14 -fsanitize=address,undefined -Wall -Wextra -Wpedantic -Wconversion -Wunused-parameter -Wunused-but-set-parameter -O2 -I$(INCDIR)
 
-#-fsanitize=address,undefined other flag to be considered
+# other flag to be considered -fsanitize=address,undefined
 
 # Files
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 
 # Program name
-PROGRAM_NAME := test
-#ifdef NAME
-#	PROGRAM_NAME := $(NAME)
-#endif
+PROGRAM_NAME := simulation
 
 # Target binary
-TARGET := $(BINDIR)/$(PROGRAM_NAME)
-MPI_TARGET := $(BINDIR)/$(PROGRAM_NAME)_mpi
+TARGET := $(BINDIR)/$(PROGRAM_NAME).exe
+MPI_TARGET := $(BINDIR)/$(PROGRAM_NAME)_mpi.exe
 
 # Default target
 all: $(TARGET)
@@ -46,8 +43,9 @@ $(MPI_TARGET): $(OBJECTS) | $(OUTDIR)
 
 # Compilation
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
+	
 # Create build directory
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -57,6 +55,7 @@ $(OUTDIR):
 
 # Clean
 clean:
+
 	rm -rf $(OBJDIR) $(TARGET) $(MPI_TARGET) $(OUTDIR)
 
 # Phony targets

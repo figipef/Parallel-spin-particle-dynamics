@@ -57,7 +57,7 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 	}else {throw std::runtime_error("Not a valid time option");}
 }
 
-Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, double _env_freq, int _ext_phase) : tag(_tag), length(_length), env_freq(_env_freq), ext_phase(_ext_phase){
+Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, int _ext_phase) : tag(_tag), length(_length), ext_phase(_ext_phase){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 	
 	//std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
@@ -144,7 +144,7 @@ double* Laser::get_fields_envelope(double pos[3], double t){
 	double field_osc = cos(xdk - freq * t);// The field part responsible for oscilation
 
  	// Calculate the phase normalized to the length so that the function is 0 at phase = 0 and phase = L
-	double phase = (xdk - env_freq * t)/length;
+	double phase = (xdk - freq * t)/length;
 
 	double envelope = 0;
 
@@ -222,7 +222,7 @@ double* Laser::get_fields(double* t, const double pos[3], int* _type){
 		double field_osc = cos(xdk - freq * (*t) + ext_phase * M_PI / 2);// The field part responsible for oscilation
 
  		// Calculate the phase normalized to the length so that the function is 0 at phase = 0 and phase = L
-		double phase = (xdk/sqrt(k[0] * k[0] + k[1] * k[1] + k[2] * k[2]) - 1 * (*t))* M_PI / length ;
+		double phase = (xdk - freq * (*t))* M_PI / length ;
 		//std::cout <<" phase: "<< phase <<"\n";
 		double envelope = 0;
 

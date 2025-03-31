@@ -36,43 +36,54 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	double* ucE = cross(u, E); //u cross E
 	double udB = inner(u, B); // u dot B
 	for (int i = 0; i < 3; i++){
-		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
+		Om[i] = -((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
 
+<<<<<<< HEAD
 	delete[] ucE;
+=======
+	delete[] ucE; 
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
 	return Om;
 }
 
-double* f_RR(double gamma, double u[3], double E[3], double B[3]){
-	double dotB_u = inner(B, u);
-	double dotE_u = inner(E,u);
- 	double b2 = inner(B, B);
-	double* crossB_E = cross(B,E);
-	double sigma0 = (2*omega0*CHARGE*CHARGE)/(3*MASS*C*C*C);
+// Calculate the radiation reaction for a given momentum
+double* f_RR(double gamma, double u[3], double E[3], double B[3]) {
 
-	// defining F^2u
-	double F2_u[3]; 
-	for (int i = 0; i<3; i++){
-		F2_u[i] = dotE_u * E[i] + crossB_E[i] * u[i] + B[i] * dotB_u - b2 * u[i];
-	}  
+    double dotB_u = inner(B, u);
+    double dotE_u = inner(E, u);
+    double b2 = inner(B, B);
+    double e2 = inner(E, E);
 
-	// (u | F^2 u)
-	double dotu_F2u = -inner(u,F2_u);
-	// (u | F^2 u)u
-	double spatial_result[3];
-	for (int i = 0; i<3; i++){
-		spatial_result[i] = F2_u[i] - dotu_F2u * u[i];
-	} 
+    double* crossB_E = cross(B, E);  // Ensure `cross` dynamically allocates memory
 
-	double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
-	double* result = new double[3];
+    double sigma0 = (2 * omega0 * CHARGE * CHARGE) / (3 * MASS * C * C * C);
+
+    // F^2 * u
+    double F2_u[3]; 
+    for (int i = 0; i < 3; i++) {
+        F2_u[i] = dotE_u * E[i] + B[i] * dotB_u - b2 * u[i] - crossB_E[i]*gamma;
+    }
+
+    double dotu_F2u = -inner(u, F2_u) + gamma*gamma*e2 + (inner(crossB_E, u))*gamma;
+
+    double spatial_result[3];
+    for (int i = 0; i < 3; i++) {
+        spatial_result[i] = F2_u[i] - dotu_F2u * u[i];
+    } 
+
+    double factor = (sigma0 * CHARGE * CHARGE) / (gamma * MASS);
+	//std::cout <<factor <<"\n";
+    double* result = new double[3];
+    
     for (int i = 0; i < 3; i++) {
         result[i] = factor * spatial_result[i];
     }
-    
-    return result;
+	
+    delete[] crossB_E;
 
+    return result;  // Caller must free this
 }
 
 // Creates a histogram based on the Diagnostics specified before
@@ -155,53 +166,82 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 	}
 }
 
+<<<<<<< HEAD
 void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
 	//std::cout << time<<" "<<n_of_particles<<"\n";
+=======
+// Particle Pusher (BORIS)
+void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, int RR, Histogram* hist, DiagnosticParameters* diag_params){
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
 		double E_field[3] = {0,0,0};
 		double B_field[3] = {0,0,0};
-
+		
 		Particle& p = particles[i];
 		//std::cout << p.getTag()<<"\n";
 
 		const double* p_position = p.getPosition();
 		const double* p_momentum = p.getMomentum();
-		//const double* p_spin = p.getSpin();
 
 		for (int j = 0; j < n_of_lasers; ++j){
 
 			// Cycle to add and get the s Electric and Magnetic Fields
-
-   			//const double* laser_E = lasers[j].get_E_0();
-   			//const double* laser_B = lasers[j].get_B_0();
-
-   			double* fields = lasers[j].get_fields(&time, p_position); // These might not be used
-   			//std::cout << "Pos: "<<p_position[0]<<" "<<p_position[1]<<" "<<p_position[2]<<"\n";
+			
+   			double* fields = lasers[j].get_fields(&time, p_position); // Save the fields
 
 			for (int k = 0; k < 3; ++k) {
+
 				E_field[k] = E_field[k] + fields[k];
 				B_field[k] = B_field[k] + fields[k+3];
-				//std::cout << "E " << E_field[k] << " B "<< B_field[k] <<"\n";
 			}
+<<<<<<< HEAD
 
 			delete[] fields;
+=======
+			
+			delete[] fields;
+
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		}
 
-		double p_momentum_copy[3];
-		p_momentum_copy[0] = p_momentum[0];
-		p_momentum_copy[1] = p_momentum[1];
-		p_momentum_copy[2] = p_momentum[2];
+		double* f_RR_Value_before;
 
-		double* f_RR_Value = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
-	
 		// 1st E half-step
 		double u_minus[3];
+<<<<<<< HEAD
 	
 		for (int j = 0; j < 3; ++j) {
 			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
 		};
+=======
+
+		if (RR == 1) {
+
+			double p_momentum_copy[3]; // To help the calculation of the Radiation Reaction
+			p_momentum_copy[0] = p_momentum[0];
+			p_momentum_copy[1] = p_momentum[1];
+			p_momentum_copy[2] = p_momentum[2];
+
+			f_RR_Value_before = f_RR(gamma(p_momentum_copy),p_momentum_copy,E_field,B_field);
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_before[j];
+		    }
+
+		    delete[] f_RR_Value_before;
+
+		} else if (RR == 0) {
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
+		    }
+
+		} else {
+		    throw std::runtime_error("Invalid RR Value");
+		}
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
         // auxiliary vector t
         double t_vec[3];
@@ -228,32 +268,53 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		double* ucs = cross(u_prime, s_vec);
 		for (int j = 0; j < 3; ++j) {
 			u_plus[j] = u_minus[j] + ucs[j];
-		}
-        
+		}	
+
         // 2nd E half-step
         double u_next[3];
+<<<<<<< HEAD
         for (int j = 0; j < 3; ++j) {
 			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
+=======
+
+        double* f_RR_Value_after;
+
+        if (RR == 1) { // Calculate the Radiation Reaction
+        	f_RR_Value_after = f_RR(gamma(u_plus),u_plus,E_field,B_field);
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0) * f_RR_Value_after[j];
+		    }
+
+		    delete[] f_RR_Value_after;
+
+		} else if (RR == 0) {
+
+		    for (int j = 0; j < 3; ++j) {
+		        u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j];
+		    }
+
+		} else {
+
+		    throw std::runtime_error("Invalid RR Value");
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		}
-        
+
         // Update the particle's momentum
 		p.setMomentum(u_next);
 
 		// Now we update the particle position with the new momentum
 		double new_gamma = gamma(u_next);
 
-		double new_v[3];
-		for (int j= 0; j <3; j++){
-			new_v[j] = u_next[j] / (new_gamma * MASS);  
-		}
-
 		double new_pos[3];
-		for (int j= 0; j <3; j++){
-			new_pos[j] = p_position[j] + time_step * new_v[j]; 
+
+		for (int j= 0; j <3; j++){ // update the position whilst calculating the velocity
+			new_pos[j] = p_position[j] + time_step * u_next[j] / (new_gamma * MASS); 
 		}
 
+		// Update the particle position
 		particles[i].setPosition(new_pos);
-
+		
 		//Spin update
 
 		// reusing auxiliary vectors t and s
@@ -281,30 +342,35 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		for (int j = 0; j < 3; ++j) {
 			spn_next[j] = spn[j] + scs[j];
 		}
+
 		p.setSpin(spn_next);
 
-		// If the histogram is passed, perform the Diagnostics
+		// If both the histogram and diagnostics parameters are passed, perform the Diagnostics
 		if(hist != nullptr && diag_params != nullptr){
 
 			PerformDiagnostics(*hist, p, diag_params -> params, \
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
 
+<<<<<<< HEAD
 		// Prevent memory leaks
+=======
+		delete[] spn;
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		delete[] uct;
 		delete[] ucs;
 		delete[] sct;
 		delete[] scs;
+<<<<<<< HEAD
 		delete[] spn; 
+=======
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		delete[] Om;
     }
 }
 
 // Creates the particles to be used in the simulation
-void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* momentum_dir, double* spin_dir, Laser* lasers, int n_of_lasers){ 
-
-	// types are defined by "uni" and "gau" || probably eventually change this to 0s && 1s to run faster
-	// CHANGE THIS NAME PLS dist_sizes is just the length of the box for uniform and a std for gaussian
+void createParticles(Particle* particles, int particle_number, std::string* types, double* dist_sizes, double* position_dir, double* momentum_dir, double* spin_dir, Laser* lasers, int n_of_lasers){ 
 
 	//Calculate the initial position according to the lasers
 
@@ -321,16 +387,18 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 		}
 	}
 
-	if (largest_laser_index != 1){ // Adjust the initial positon according to the size of the laser
+	if (largest_laser_index != -1){ // Adjust the initial positon according to the size of the laser
 		Laser l = lasers[largest_laser_index];
 
 		double abs_k = std::sqrt(l.k[0] * l.k[0] + l.k[1] * l.k[1] + l.k[2] + l.k[2]);
-		double mult = 0; // top differentiate from uniform and gaussian 
+		double mult = 0; // to differentiate from uniform and gaussian 
 
 		if (types[0] == "0"){
 			mult = dist_sizes[0];
+		} else if (types[0] == "1"){
+			mult = dist_sizes[0] * 3; // 3 standard deviations
 		} else {
-			mult = dist_sizes[0] * 3;
+			mult = 0;
 		}
 
 		// To copy the sign for k in case of negative k's
@@ -339,8 +407,6 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 		pos_shift[2] = l.k[2]/abs_k * l.length + (l.k[2] == 0 ? 0.0 : (std::copysign(1.0, l.k[2]) * mult));
 		
 	}
-
-    double spin[3] = {0,0,0};
 
     std::random_device rd;   // Random seed generator
     std::mt19937 gen(rd());  // Mersenne Twister PRNG seeded with rd()
@@ -352,20 +418,20 @@ void createParticles(Particle* particles, int particle_number, std::string* type
     std::unique_ptr<std::normal_distribution<double>> momentum_gaussian;
 	std::unique_ptr<std::uniform_real_distribution<double>> unif_1to0_dist; //standard 0 to 1 uniform dist im using for spin
 
-    if (types[0] == "0"){
+    if (types[0] == "0"){ // Create the spacial uniform distribution
 
     	space_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[0], dist_sizes[0]);
     
-    } else {
+    } else { // Create the spacial gaussian distribution
 
     	space_gaussian = std::make_unique<std::normal_distribution<double>>(0.0, dist_sizes[0]);
     }
 
-    if (types[1] == "0") {
+    if (types[1] == "0") { // Create the momentum uniform distribution
 
     	momentum_uniform = std::make_unique<std::uniform_real_distribution<double>>(-dist_sizes[1], dist_sizes[1]);
-
-    } else {
+ 
+    } else { // Create the momentum gaussian distribution
 
     	momentum_gaussian = std::make_unique<std::normal_distribution<double>>(0.0, dist_sizes[1]);
 
@@ -373,9 +439,10 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 
 	for (int i = 0; i < particle_number; ++i) {
 
+		// Default values
 		double pos[3] = {0,0,0};
 		double mom[3] = {0,0,0};
-
+		double spin[3] = {0,0,0};
 
 		// Assign the position values
 		if (types[0] == "0"){
@@ -391,7 +458,11 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 			do { pos[2] = (*space_gaussian)(gen); } while (std::abs(pos[2]) > 3 * dist_sizes[0]);
 
 		} else if (types[0] == "2") {
-			throw std::runtime_error("Still undefined");
+
+			pos[0] = position_dir[0];
+			pos[1] = position_dir[1];
+			pos[2] = position_dir[2];
+
 		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
 		// Assign the momentum values
@@ -415,10 +486,12 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 
 		} else { throw std::runtime_error("Invalid position type in particle creator"); }
 
+		// Add the laser shifts
 		pos[0] = pos[0] + pos_shift[0];
 		pos[1] = pos[1] + pos_shift[1];
 		pos[2] = pos[2] + pos_shift[2];
 
+		// Assign the spin values
 		if (types[2] == "0"){
 
 			unif_1to0_dist = std::make_unique<std::uniform_real_distribution<double>>(0., 1.);
@@ -433,15 +506,16 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 		
 		} else if (types[2] == "1"){
 
-			double Norm = sqrt(inner(spin_dir, spin_dir)); //sqrt(spin_dir[0]*spin_dir[0] + spin_dir[1]*spin_dir[1] + spin_dir[2]*spin_dir[2]);
+			double Norm = sqrt(inner(spin_dir, spin_dir));
 			spin[0] = spin_dir[0] / Norm;
 			spin[1] = spin_dir[1] / Norm;
 			spin[2] = spin_dir[2] / Norm;
         
 		} else if (types[2] == "2"){
-			//double* s_try = new double[3];
+
 			bool accept = false;
 			unif_1to0_dist = std::make_unique<std::uniform_real_distribution<double>>(0., 1.);
+
 			while (!accept){
 				
 				double phi = 2.*M_PI*(*unif_1to0_dist)(gen);
@@ -465,30 +539,43 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 
 		}
 
-	    particles[i] = Particle(pos,mom,spin,i);  // Create the particle to the array
+	    particles[i] = Particle(pos,mom,spin,i);  // Assign the particle to the array
 
 	}
 }
 
+// Writes the electric and magnetic fields to the files according to the diagnostics
 void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, int& laser_number){
+
+	// Variable initialization
 	double dx, min, max, x;
 	double t;
 	int dir;
 	double pos[3] = {0.,0.,0.};
 
 	if (fieldiag[0] == 1.){
+
+		// Save the needed diagnostic parameters
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
 		dir = fieldiag[5];
+
+		// Create the eletric fields files
 		std::ofstream e_field_1("../output/e_field1.txt");
 		std::ofstream e_field_2("../output/e_field2.txt");
 		std::ofstream e_field_3("../output/e_field3.txt");
+<<<<<<< HEAD
 		//std::cout<<"look here idiot\n";
 		std::cout << "E = [ " <<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<< " ]\n";
         std::cout << "B = [ " <<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<< " ]\n";
+=======
+
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		double t1 = 0.;
 		double pos1[3] = {2.,0,0};
+
+		// Write to the file
 		for (t = 0.; t < iter*dt; t = t + dt){
 			for (x = min; x <= max; x = x + dx){
 				pos[dir-1] = x;
@@ -503,14 +590,19 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 	}
 
 	if (fieldiag[1] == 1.){
+
+		// Save the needed diagnostic parameters
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
 		dir = fieldiag[5];
+
+		// Create the eletric fields files
 		std::ofstream b_field_1("../output/b_field1.txt");
 		std::ofstream b_field_2("../output/b_field2.txt");
 		std::ofstream b_field_3("../output/b_field3.txt");
 
+		// Write to the file
 		for (t = 0.; t < iter*dt; t = t + dt){
 			for (x = min; x <= max; x = x + dx){
 				pos[dir-1] = x;
@@ -526,8 +618,13 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
+<<<<<<< HEAD
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
+=======
+void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& position_dir, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR, int*& particle_params){
+>>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
@@ -562,8 +659,17 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
 	dist_types[2] = values["SPIN_DIST_TYPE"];
 
+	particle_params[0] = std::stoi(values["FOLLOW_PARTICLE"]);
+	particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
+	particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
+
+	if (dist_types[0] == "2"){
+		if(values["POSITION_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Position Selected But No Coordinates Indicated! Please Initialize It Correctly in Input");}}
+		parseVector(values["POSITION_PREF_DIR"], position_dir);
+	}
+
 	if (dist_types[1] == "2"){
-		if(values["MOMENTUM_DIST_TYPE"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
+		if(values["MOMENTUM_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Momentum Direction Distribution Selected But No Direction Indicated! Please Initialize It Correctly in Input");}}
 		parseVector(values["MOMENTUM_PREF_DIR"], momentum_dir);
 	}
 
@@ -753,6 +859,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
 
     				double temp_E[3] = {0}, temp_B[3] = {0};
     				double freq = std::stod(values["FREQ" + std::to_string(l_index)]);
+
     				// Parse the input file text to vectors for Eletric and Wave vector
     				parseVector(values["E" + std::to_string(l_index)], temp_E);
     				parseVector(values["B" + std::to_string(l_index)], temp_B);
@@ -777,15 +884,11 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
 
     			if (values["K" + std::to_string(l_index)].empty()){
     				throw std::runtime_error("No wave vector (k) defined for a packet laser (type 3)");}
-
-    			if (values["ENV_FREQ" + std::to_string(l_index)].empty()){
-    				throw std::runtime_error("No envelope frequency defined for a packet laser (type 3)");}
     				
     			if (values["ENV_L" + std::to_string(l_index)].empty()){
     				throw std::runtime_error("No envelope length defined for a packet laser (type 3)");}	
 
     			double env_l = std::stod(values["ENV_L" + std::to_string(l_index)]);
-    			double env_freq = std::stod(values["ENV_FREQ" + std::to_string(l_index)]);
 
     			double temp_E[3] = {0}, temp_k[3] = {0};
 
@@ -793,7 +896,7 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     			parseVector(values["E" + std::to_string(l_index)], temp_E);
     			parseVector(values["K" + std::to_string(l_index)], temp_k);
 
-    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, env_l, env_freq, ext_phase);
+    			lasers[l_index - 1] = Laser(temp_E, temp_k, -l_index, env_l, ext_phase);
 
     		} else {throw std::runtime_error("Invalid Laser type");}
 
@@ -820,10 +923,54 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
 
     	binsize[i] = (binmax[i] - binmin[i]) / (bin_n[i] - 1 + 1e-308); // calculate the size of each bin
 
-        //bin_n[i] = std::round((binmax[i] - binmin[i]) / binsize[i] + 1); // Calculate the size of the histogram
-    	//std::cout << binsize[i];
         if (binsize[i] < 0){
         	throw std::runtime_error("Invalid Bin parameters for BIN_NUMBER= " +  std::to_string(i+1)); // Throw the error if the number of bins doesnt make sense
+        }
+    }
+}
+
+// Sets the necessary variables to follow the particles
+void setupFollowParticles(int* follow_params,std::ofstream* file_pos, std::ofstream* file_mom, std::ofstream* file_spn, int*& followed_particles, int& number_follow_particles, int particle_number){
+	
+	if (follow_params[2] > particle_number){throw std::runtime_error("Number of followed particles larger than simulated particles");}
+
+	if (follow_params[0] == 1){
+
+        if (follow_params[1] == 1){
+
+            followed_particles = new int[follow_params[2]];
+
+            std::random_device rd;
+            std::mt19937 gen(rd()); // Mersenne Twister engine
+            std::uniform_int_distribution<> dis(0, particle_number);
+
+            number_follow_particles = follow_params[2];
+
+            for (int i = 0; i < number_follow_particles; i++){
+
+                followed_particles[i] = dis(gen);
+                
+                file_pos[i].open("../output/position" + std::to_string(followed_particles[i]) + ".txt");
+                file_mom[i].open("../output/momentum" + std::to_string(followed_particles[i]) + ".txt");
+                file_spn[i].open("../output/spin" + std::to_string(followed_particles[i]) + ".txt");
+
+            }
+
+        } else if (follow_params[1] == 0){
+
+            followed_particles = new int[1];
+
+            number_follow_particles = 1;
+
+            followed_particles[0] = follow_params[2];
+
+            file_pos[0].open("../output/position" + std::to_string(followed_particles[0]) + ".txt");
+            file_mom[0].open("../output/momentum" + std::to_string(followed_particles[0]) + ".txt");
+            file_spn[0].open("../output/spin" + std::to_string(followed_particles[0]) + ".txt");
+
+        } else {
+
+            std::cout <<"2nd following parameter wrong \n";
         }
     }
 }

@@ -39,18 +39,23 @@ void writeToFile(std::ofstream& file, const Particle& p, char a){
 	}	
 }
  
-void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t){
+void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t, const std::string* params, const int n_of_par){
 
 	std::ostringstream filename_temp;
 
-	filename_temp << "../output/histogram" << std::setw(8) << std::setfill('0') << iter;  // 8 digits with leading zeros
+	filename_temp << "../output/histogram" << std::setw(10) << std::setfill('0') << iter;  // 10 digits with leading zeros
 
 	std::string filename = filename_temp.str() + ".txt";
 
 	std::ofstream outFile(filename);
 
 	if (outFile.is_open()){
-		outFile << "Time: " << t << "\n";
+		outFile << "Time: " << t;
+
+		for (int i; i < n_of_par; i++){
+			outFile << " Par" << i+1 <<": "<< params[i];
+		}
+		outFile << "\n";
 		if (!hist.is_matrix){
 
 			 for (const auto& bin : hist.vector1D) {
@@ -87,4 +92,23 @@ void parseVector(const std::string& value, double vec[3]) {
     std::istringstream ss(value);
     char comma; // To skip the commas
     ss >> vec[0] >> comma >> vec[1] >> comma >> vec[2];
+}
+
+// Courtesy of João Chaveiro
+void printProgressBar(int progress, int total, int barWidth) {
+
+  float percent = (float)progress / total;
+  int filled = percent * barWidth;
+
+  std::cout << "\r[0] Simulation progress: [";
+  for (int i = 0; i <= barWidth; i++) {
+      if (i < filled)
+          std::cout << "=";
+      else if (i == filled)
+          std::cout << ">";
+      else
+          std::cout << " ";
+  }
+  std::cout << "] " << int(percent * 100.0) << "%";
+  std::cout.flush();
 }
