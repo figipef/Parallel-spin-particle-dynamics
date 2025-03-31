@@ -39,11 +39,7 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 		Om[i] = -((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
 
-<<<<<<< HEAD
 	delete[] ucE;
-=======
-	delete[] ucE; 
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
 	return Om;
 }
@@ -166,13 +162,8 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 	}
 }
 
-<<<<<<< HEAD
-void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, Histogram* hist, DiagnosticParameters* diag_params){
-	//std::cout << time<<" "<<n_of_particles<<"\n";
-=======
 // Particle Pusher (BORIS)
 void boris(Particle* particles, Laser* lasers, double time, double time_step, int n_of_particles, int n_of_lasers, int RR, Histogram* hist, DiagnosticParameters* diag_params){
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
 	for (int i = 0; i < n_of_particles; ++i) {
 
@@ -196,26 +187,15 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 				E_field[k] = E_field[k] + fields[k];
 				B_field[k] = B_field[k] + fields[k+3];
 			}
-<<<<<<< HEAD
-
-			delete[] fields;
-=======
 			
 			delete[] fields;
 
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		}
 
 		double* f_RR_Value_before;
 
 		// 1st E half-step
 		double u_minus[3];
-<<<<<<< HEAD
-	
-		for (int j = 0; j < 3; ++j) {
-			u_minus[j] = p_momentum[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
-		};
-=======
 
 		if (RR == 1) {
 
@@ -241,7 +221,6 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		} else {
 		    throw std::runtime_error("Invalid RR Value");
 		}
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 
         // auxiliary vector t
         double t_vec[3];
@@ -272,10 +251,6 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 
         // 2nd E half-step
         double u_next[3];
-<<<<<<< HEAD
-        for (int j = 0; j < 3; ++j) {
-			u_next[j] = u_plus[j] + (CHARGE * time_step / (2.0 * MASS)) * E_field[j] + (time_step / 2.0)*f_RR_Value[j];
-=======
 
         double* f_RR_Value_after;
 
@@ -297,7 +272,6 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		} else {
 
 		    throw std::runtime_error("Invalid RR Value");
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		}
 
         // Update the particle's momentum
@@ -352,19 +326,11 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 				diag_params -> bsize, diag_params -> bmax, diag_params -> bmin, diag_params -> n_of_pars);
 		}
 
-<<<<<<< HEAD
-		// Prevent memory leaks
-=======
-		delete[] spn;
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		delete[] uct;
 		delete[] ucs;
 		delete[] sct;
 		delete[] scs;
-<<<<<<< HEAD
 		delete[] spn; 
-=======
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		delete[] Om;
     }
 }
@@ -565,13 +531,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		std::ofstream e_field_1("../output/e_field1.txt");
 		std::ofstream e_field_2("../output/e_field2.txt");
 		std::ofstream e_field_3("../output/e_field3.txt");
-<<<<<<< HEAD
-		//std::cout<<"look here idiot\n";
-		std::cout << "E = [ " <<lasers[0].get_E_0()[0]<<", "<<lasers[0].get_E_0()[1]<<", "<<lasers[0].get_E_0()[2]<< " ]\n";
-        std::cout << "B = [ " <<lasers[0].get_B_0()[0]<<", "<<lasers[0].get_B_0()[1]<<", "<<lasers[0].get_B_0()[2]<< " ]\n";
-=======
 
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
 		double t1 = 0.;
 		double pos1[3] = {2.,0,0};
 
@@ -618,13 +578,9 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 }
 
 // Setups the variables for the simulation and diagnostics
-<<<<<<< HEAD
-void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
-=======
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& position_dir, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
 	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR, int*& particle_params){
->>>>>>> fdd5e2a73ab351db4e4328a454536c076864f234
+
 
 	/*
 	Function that takes both simulation and diagnostics input parameters and updates them through the input_file
