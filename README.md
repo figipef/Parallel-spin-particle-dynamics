@@ -17,6 +17,9 @@ A high-performance simulation of a charged particle under electromagnetic fields
   - [Laser Parameters](#laser-parameters)  
     - [Parameter Description](#parameter-description-2)  
     - [Parameter Options](#parameter-options-2)  
+- [Python Files](#python-files)
+  - [File Overview](#file-overview)
+  - [Dependencies](#dependecies)
 - [Authors](#authors)
 
 ## Installation
@@ -25,6 +28,7 @@ A high-performance simulation of a charged particle under electromagnetic fields
    ```sh
    git clone https://github.com/figipef/Parallel-spin-particle-dynamics.git
    cd Parallel-spin-particle-dynamics
+   cd build
    ```
 2. Compile the project:
    ```sh
@@ -47,6 +51,12 @@ To apply verbosity run, where the number after the executable defines de verbosi
 ```sh
 ./simulation_mpi.exe 1
 ``` 
+
+To run the python file:
+```sh
+cd ..
+python main.py
+```
 
 ## Configuration
 
@@ -190,6 +200,29 @@ Particles will always be created in the direction of the longest laser in case o
 
 `PHASE*`:
  Has to be an integer
+
+## Python Files
+
+The Python helper scripts are located in the `python_helper/` directory. These scripts assist with reading simulation data, performing analysis, and plotting results.
+
+### File Overview
+
+- `python_helper/Reader.py`  
+  Responsible for reading simulation output files and input configuration files.
+
+- `python_helper/Plotter.py`  
+  Provides ready-to-use plotting functions for visualizing particle and spin dynamics.
+
+- `main.py` (located in the root directory)  
+  The main Python entry point that ties together reading, processing, and plotting — similar in spirit to a `main()` function in C++.
+
+### Dependencies
+
+If you encounter missing libraries, install them using:
+
+```bash
+pip install <library-name>
+```
 
 ## Authors
 
