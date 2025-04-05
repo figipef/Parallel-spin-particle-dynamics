@@ -110,7 +110,7 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 
 		if (!(value < bmin[0] || value > bmax[0])) { // Ignore out-of-range values
 
-			int index = std::round((value - bmin[0]) / bsize[0]); // Compute bin index
+			int index = static_cast<int>(std::round((value - bmin[0])) / bsize[0]); // Compute bin index
 			hist.vector1D[index]++; // Increment corresponding bin
 		}  
 
@@ -149,8 +149,8 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 		bool i1 = false;
 		bool i2 = false;
 
-		if (!(value1 < bmin[0] || value1 > bmax[0])) {index1 = std::round((value1 - bmin[0]) / bsize[0]); i1 = true;}  // Ignore out-of-range values and Compute bin index
-		if (!(value2 < bmin[1] || value2 > bmax[1])) {index2 = std::round((value2 - bmin[1]) / bsize[1]); i2 = true;}  // Ignore out-of-range values and Compute bin index
+		if (!(value1 < bmin[0] || value1 > bmax[0])) {index1 = static_cast<int>(std::round((value1 - bmin[0])) / bsize[0]); i1 = true;}  // Ignore out-of-range values and Compute bin index
+		if (!(value2 < bmin[1] || value2 > bmax[1])) {index2 = static_cast<int>(std::round((value2 - bmin[1])) / bsize[1]); i2 = true;}  // Ignore out-of-range values and Compute bin index
 
 		if (i1 && i2){
 			hist.matrix2D[index2][index1]++;  // Increment corresponding bin
@@ -511,7 +511,7 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 }
 
 // Writes the electric and magnetic fields to the files according to the diagnostics
-void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, int& laser_number){
+void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers){
 
 	// Variable initialization
 	double dx, min, max, x;
@@ -525,15 +525,12 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
-		dir = fieldiag[5];
+		dir = static_cast<int>(fieldiag[5]);
 
 		// Create the eletric fields files
 		std::ofstream e_field_1("../output/e_field1.txt");
 		std::ofstream e_field_2("../output/e_field2.txt");
 		std::ofstream e_field_3("../output/e_field3.txt");
-
-		double t1 = 0.;
-		double pos1[3] = {2.,0,0};
 
 		// Write to the file
 		for (t = 0.; t < iter*dt; t = t + dt){
@@ -555,7 +552,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
-		dir = fieldiag[5];
+		dir = static_cast<int>(fieldiag[5]);
 
 		// Create the eletric fields files
 		std::ofstream b_field_1("../output/b_field1.txt");
@@ -579,7 +576,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 
 // Setups the variables for the simulation and diagnostics
 void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*& dist_types, double*& dist_sizes, double*& position_dir, double*& momentum_dir, double*& spin_dir, double& timestep, double& totaltime, int& step_diag, std::string*& params,
-	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR, int*& particle_params){
+	 double*& binsize, double*& binmax, double*& binmin, int*& bin_n, int& n_par, double*& fieldiag, Laser*& lasers, int& laser_number, int& RR){
 
 
 	/*
@@ -614,10 +611,6 @@ void setupInputVariable(std::ifstream& input_file, int& particle_n, std::string*
     dist_types[0] = values["POSITION_DIST_TYPE"];
     dist_types[1] = values["MOMENTUM_DIST_TYPE"];
 	dist_types[2] = values["SPIN_DIST_TYPE"];
-
-	//particle_params[0] = std::stoi(values["FOLLOW_PARTICLE"]);
-	//particle_params[1] = std::stoi(values["RANDOM_PARTICLE"]);
-	//particle_params[2] = std::stoi(values["PARTICLE_NUMBER"]);
 
 	if (dist_types[0] == "2"){
 		if(values["POSITION_PREF_DIR"].empty()){{throw std::runtime_error("Preferred Position Selected But No Coordinates Indicated! Please Initialize It Correctly in Input");}}

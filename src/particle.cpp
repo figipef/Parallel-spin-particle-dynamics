@@ -30,7 +30,7 @@ const double* Particle::getMomentum() const{
 const double* Particle::getSpin() const{
     return spin;
 }
-const int Particle::getTag() const{
+int Particle::getTag() const{
     return tag;
 }
 // Functions to display values

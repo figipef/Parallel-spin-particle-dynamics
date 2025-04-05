@@ -26,7 +26,7 @@ public:
     const double* getPosition() const;
     const double* getMomentum() const;
     const double* getSpin() const;
-    const int getTag() const;
+    int getTag() const;
 
     // Functions to display values
     void display_position() const;

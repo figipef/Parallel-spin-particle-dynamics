@@ -52,7 +52,6 @@ int main(int argc, char* argv[]) {
     double time_step;                // Simulation time-step
     double total_time;               // Total time the simulation is ran for
     int RR = 0;                      // Bool to check for the inclusion of radiation reaction
-    int* follow_params = new int[3]; // Refer to read me to see what each index mean
 
     // Initalize the variables for particle creation
 
@@ -74,15 +73,6 @@ int main(int argc, char* argv[]) {
     int n_par = 0;                            // Number of parameters
     int step_diag;                            // Number of iterations for diagnostics
 
-    // Initialize the variables to follow particles
-
-    int* followed_particles;          // Array with the indexes for the followed particless
-    int number_follow_particles = 0;  // Number of followed particles
-
-    std::ofstream file_pos[100];      // Array to the files to store the position of the particles
-    std::ofstream file_mom[100];      // Array to the files to store the momentum of the particles 
-    std::ofstream file_spn[100];      // Array to the files to store the spin of the particles  
-
     // Initaliaze the variables for the lasers
 
     Laser* lasers = new Laser[10]; // Not the real amount of Lasers, just allocating memory for future use
@@ -102,7 +92,7 @@ int main(int argc, char* argv[]) {
     if (!input_file) { throw std::runtime_error("Input file not found!"); } // Check the existence of the input file
 
     // Setup ALL the input file variables
-    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR, follow_params);
+    setupInputVariable(input_file, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, time_step, total_time, step_diag, params, binsize, binmax, binmin, bin_n, n_par, fieldiag, lasers, laser_number, RR);
 
     if (rank == 0){logger.logLasers(3, lasers, laser_number);}
 
@@ -117,15 +107,7 @@ int main(int argc, char* argv[]) {
 
     // Create the particles according to input parameters
     createParticles(particles, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, lasers, laser_number);
-    /*
-    if (rank == 0){logger.log(2,"\n  [2] Setting up followed particles \n"); }
 
-    // Create the files and save the necessary variables to follow particles
-    setupFollowParticles(follow_params, file_pos, file_mom, file_spn, followed_particles, number_follow_particles, particle_number);
-
-    // Ensure all processes receive the same followed_particles array
-    MPI_Bcast(followed_particles, number_follow_particles, MPI_INT, 0, MPI_COMM_WORLD);
-    */
     double start_time = MPI_Wtime(); // Performance Time check
 
     // Division of particles for the processes
@@ -180,22 +162,6 @@ int main(int argc, char* argv[]) {
             boris(particles + start_idx, lasers, t, time_step, end_idx - start_idx, laser_number, RR);
 
         }
-        /*
-        if (follow_params[0] == 1){
-
-            // Save write to the files the necessary particle information
-
-            for (int i = 0; i < number_follow_particles; i++){
-
-                if (followed_particles[i] < end_idx && followed_particles[i] >= start_idx){ // only write particles corresponding to each process
-
-                    writeToFile(file_pos[i], particles[followed_particles[i]], 'p');
-                    writeToFile(file_mom[i], particles[followed_particles[i]], 'm');
-                    writeToFile(file_spn[i], particles[followed_particles[i]], 's'); 
-                }
-            }                
-        }
-        */
 
         counter++;
     }
@@ -212,7 +178,7 @@ int main(int argc, char* argv[]) {
 
     if (rank == 0) {
 
-        logger.log(2,"\n  [2] Setup took " + std::to_string(duration1.count()/1000.) + " seconds \n");
+        logger.log(2,"\n  [2] Setup took " + std::to_string(static_cast<double>(duration1.count())/1000.) + " seconds \n");
         logger.log(2,"\n  [2] Simulation took " + std::to_string(max_time) + " seconds \n");
 
         logger.log(0,"\n[0] Successfully Finished Running \n");     

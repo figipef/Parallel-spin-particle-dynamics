@@ -27,8 +27,8 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 // Creates the particles
 void createParticles(Particle*, int, std::string*, double*, double*, double*, double*, Laser*, int);
 // Writes the fields to perform diagnsotics
-void FieldDiagWritter(double&, int&, double*& fieldiag, Laser*& lasers, int& laser_number);
+void FieldDiagWritter(double&, int&, double*& fieldiag, Laser*& lasers);
 // Sets up the input variables
-void setupInputVariable(std::ifstream&, int&, std::string*&, double*&, double*&, double*&, double*&, double&, double&, int&, std::string*&, double*&, double*&, double*&, int*&, int&, double*&, Laser*&, int&, int&, int*&);
+void setupInputVariable(std::ifstream&, int&, std::string*&, double*&, double*&, double*&, double*&, double&, double&, int&, std::string*&, double*&, double*&, double*&, int*&, int&, double*&, Laser*&, int&, int&);
 // Sets up the parameters to follow and save the particle data to files
 void setupFollowParticles(int*, std::ofstream*, std::ofstream*, std::ofstream*, int*&, int&, int);

@@ -57,7 +57,7 @@ Laser::Laser(double _e_0[3], double _temp[3], int _tag, char _f_option, char _t_
 	}else {throw std::runtime_error("Not a valid time option");}
 }
 
-Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, int _ext_phase) : tag(_tag), length(_length), ext_phase(_ext_phase){
+Laser::Laser(double _e_0[3], double _k[3], int _tag, double _length, int _ext_phase) : length(_length), tag(_tag), ext_phase(_ext_phase){
 	std::copy(_e_0, _e_0 + 3, e_0); // copy the letric field intensity from _e_0 to e_0
 	
 	//std::cout <<"E" << e_0[0]<<e_0[1]<<e_0[2]<< "\n ";
