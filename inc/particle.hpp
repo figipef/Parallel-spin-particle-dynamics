@@ -4,14 +4,16 @@
 #include <iostream>
 
 class Particle {
+    
 private:
 
-    double position[3];
-    double momentum[3];
-    double spin[3];
-    int tag;
+    double position[3]; // 3D position (x,y,z)
+    double momentum[3]; // 3D momentum (px,py,pz)
+    double spin[3];     // 3D spin (Sx,Sy,Sz)
+    int tag;            // Particle Tag
 
 public:
+
     // Default Constructor
     Particle();
     // Constructor

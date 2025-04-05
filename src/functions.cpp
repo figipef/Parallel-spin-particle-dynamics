@@ -5,7 +5,7 @@
 // CONSTANTS (almost)
 
 double MASS = 1; 
-double CHARGE = 1;
+double CHARGE = -1;
 double omega0 = 1;
 double C = 1;
 double G = 1; // hum whats this one? idk
@@ -36,7 +36,7 @@ double* Omega(double gamma, double u[3], double E[3], double B[3]){
 	double* ucE = cross(u, E); //u cross E
 	double udB = inner(u, B); // u dot B
 	for (int i = 0; i < 3; i++){
-		Om[i] = -((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
+		Om[i] = ((a + 1./gamma)*(ucE[i] - gamma*B[i]) + a*udB*u[i]/(gamma + 1.))/gamma;
 	}
 
 	delete[] ucE; 
@@ -290,9 +290,30 @@ void boris(Particle* particles, Laser* lasers, double time, double time_step, in
 		
 		//Spin update
 
+		double new_E_field[3] = {0,0,0};
+		double new_B_field[3] = {0,0,0};
+
+		const double* new_p_position = particles[i].getPosition();
+
+		for (int j = 0; j < n_of_lasers; ++j){
+
+			// Cycle to add and get the s Electric and Magnetic Fields
+			
+   			double* fields = lasers[j].get_fields(&time, new_p_position); // Save the fields
+
+			for (int k = 0; k < 3; ++k) {
+
+				new_E_field[k] = new_E_field[k] + fields[k];
+				new_B_field[k] = new_B_field[k] + fields[k+3];
+			}
+			
+			delete[] fields;
+
+		}
+
 		// reusing auxiliary vectors t and s
         factor = time_step / 2.0;
-		double* Om = Omega(new_gamma, u_next, E_field, B_field);
+		double* Om = Omega(new_gamma, u_next, new_E_field, new_B_field);
         for (int j = 0; j < 3; ++j) {
             t_vec[j] = factor * Om[j];
         }
@@ -450,7 +471,9 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 			mom[2] = momentum_dir[2];
 
 		} else { throw std::runtime_error("Invalid position type in particle creator"); }
-
+		mom[1] = mom[1];
+		mom[2] = mom[2]; // REMOVER ESTAS LINHAS!!!!!!!
+		mom[0] = std::abs(mom[0]);
 		// Add the laser shifts
 		pos[0] = pos[0] + pos_shift[0];
 		pos[1] = pos[1] + pos_shift[1];
@@ -896,7 +919,7 @@ void setupFollowParticles(int* follow_params,std::ofstream* file_pos, std::ofstr
 
             std::random_device rd;
             std::mt19937 gen(rd()); // Mersenne Twister engine
-            std::uniform_int_distribution<> dis(0, particle_number);
+            std::uniform_int_distribution<> dis(0, particle_number-1);
 
             number_follow_particles = follow_params[2];
 

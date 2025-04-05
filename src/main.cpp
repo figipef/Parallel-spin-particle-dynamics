@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
     // Create the particles according to input parameters
     createParticles(particles, particle_number, distribution_types, distribution_sizes, pos_dir, mom_dir, spin_dir, lasers, laser_number);
-
+    
     logger.log(2,"\n  [2] Setting up followed particles \n"); 
 
     // Create the files and save the necessary variables to follow particles

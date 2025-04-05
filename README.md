@@ -26,15 +26,11 @@ A high-performance simulation of a charged particle under electromagnetic fields
    git clone https://github.com/figipef/Parallel-spin-particle-dynamics.git
    cd Parallel-spin-particle-dynamics
    ```
-2. Install dependencies:
+2. Compile the project:
    ```sh
-   sudo apt install openmpi-bin libopenmpi-dev
+   make
    ```
-3. Compile the project:
-   ```sh
-   make mpi
-   ```
-4. Clean project folders:
+3. Clean project folders:
    ```sh
    make clean
    ``` 
@@ -43,13 +39,13 @@ A high-performance simulation of a charged particle under electromagnetic fields
 
 Run the simulation using (in this case 8 processes):
 ```sh
-mpirun -np 8 ./simulation_mpi.exe
+./simulation_mpi.exe
 ``` 
 
 Verbose options are `0`, `1`, `2`, `3` according to the user desire. It is `0` by default.
 To apply verbosity run, where the number after the executable defines de verbosity option:
 ```sh
-mpirun -np 8 ./simulation_mpi.exe 1
+./simulation_mpi.exe 1
 ``` 
 
 ## Configuration
@@ -158,7 +154,7 @@ Particles will always be created in the direction of the longest laser in case o
 `B*` is the inital magnetic field strength in normalized units
 `FREQ*` is the laser/fields frequency
 `ENV_L*` is the length of the envelope of a finite laser pulse
-`PHASE*` is multiple of PI that is added as a phase
+`PHASE*` is multiple of PI/2 that is added as a phase
 
 `*` is an integer that numbers the lasers. Must start at 1.
 

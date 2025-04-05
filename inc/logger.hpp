@@ -11,12 +11,14 @@ private:
 public:
     explicit Logger(int level) : verbosity(level) {}
 
+    // Simple logger for any message
     void log(int level, const std::string& message) const {
         if (level <= verbosity) {
             std::cout << message << std::endl;
         }
     }
 
+    // Logger to specifically cout lasers
     void logLasers(int level, const Laser* lasers, int n_of_lasers) const {
         if (level <= verbosity) {
             std::cout <<"\n   [3] Printing used lasers \n \n" ;
@@ -43,6 +45,7 @@ public:
         }
     }
 
+    // Logger to specifally cout diagnostic parameters
     void logDiag(int level, const DiagnosticParameters diags){
         if (level <= verbosity) {
             std::cout <<"\n   [3] Printing Parameters \n \n" ;
