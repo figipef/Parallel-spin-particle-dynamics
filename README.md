@@ -205,5 +205,5 @@ Rafael Fleming
 
 Under the guidance of:
 
-Marija Vranic
+Profs Marija Vranic
 Bernardo Barbosa
