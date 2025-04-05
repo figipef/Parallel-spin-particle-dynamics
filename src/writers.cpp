@@ -52,7 +52,7 @@ void writeDiagnosticsToFile(const Histogram hist, const int iter, const double t
 	if (outFile.is_open()){
 		outFile << "Time: " << t;
 
-		for (int i; i < n_of_par; i++){
+		for (int i = 0; i < n_of_par; i++){
 			outFile << " Par" << i+1 <<": "<< params[i];
 		}
 		outFile << "\n";
@@ -95,10 +95,10 @@ void parseVector(const std::string& value, double vec[3]) {
 }
 
 // Courtesy of João Chaveiro
-void printProgressBar(int progress, int total, int barWidth) {
+void printProgressBar(double progress, double total, int barWidth) {
 
-  float percent = (float)progress / total;
-  int filled = percent * barWidth;
+  float percent = (float)progress / (float) total;
+  int filled =  static_cast<int>(std::round(percent * (float) barWidth));
 
   std::cout << "\r[0] Simulation progress: [";
   for (int i = 0; i <= barWidth; i++) {

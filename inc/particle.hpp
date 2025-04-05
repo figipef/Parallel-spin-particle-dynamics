@@ -4,7 +4,7 @@
 #include <iostream>
 
 class Particle {
-    
+
 private:
 
     double position[3]; // 3D position (x,y,z)
@@ -28,7 +28,7 @@ public:
     const double* getPosition() const;
     const double* getMomentum() const;
     const double* getSpin() const;
-    const int getTag() const;
+    int getTag() const;
 
     // Functions to display values
     void display_position() const;

@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     logger.log(1,"\n [1] Successfully Finished Simulation \n");
 
     logger.log(2,"\n  [2] Writing Fields Diagnostics (If selected) \n");
-    FieldDiagWritter(time_step, counter, fieldiag, lasers, laser_number);
+    FieldDiagWritter(time_step, counter, fieldiag, lasers);
 
     //  Clean the Dinamically allocated memory
 
@@ -184,8 +184,8 @@ int main(int argc, char* argv[]) {
     auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop - time_setup);
     auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(time_loop_end - time_loop);
 
-    logger.log(2,"\n  [2] Setup took " + std::to_string(duration1.count()/1000.) + " seconds \n");
-    logger.log(2,"\n  [2] Simulation took " + std::to_string(duration2.count()/1000.) + " seconds \n");
+    logger.log(2,"\n  [2] Setup took " + std::to_string(static_cast<double>(duration1.count())/1000.) + " seconds \n");
+    logger.log(2,"\n  [2] Simulation took " + std::to_string(static_cast<double>(duration2.count())/1000.) + " seconds \n");
 
     logger.log(0,"\n[0] Successfully Finished Running \n");
 

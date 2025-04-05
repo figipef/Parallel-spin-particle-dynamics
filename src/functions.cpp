@@ -110,7 +110,7 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 
 		if (!(value < bmin[0] || value > bmax[0])) { // Ignore out-of-range values
 
-			int index = std::round((value - bmin[0]) / bsize[0]); // Compute bin index
+			int index = static_cast<int>(std::round((value - bmin[0]) / bsize[0])); // Compute bin index
 			hist.vector1D[index]++; // Increment corresponding bin
 		}  
 
@@ -149,8 +149,8 @@ void PerformDiagnostics(Histogram& hist, Particle particle,  \
 		bool i1 = false;
 		bool i2 = false;
 
-		if (!(value1 < bmin[0] || value1 > bmax[0])) {index1 = std::round((value1 - bmin[0]) / bsize[0]); i1 = true;}  // Ignore out-of-range values and Compute bin index
-		if (!(value2 < bmin[1] || value2 > bmax[1])) {index2 = std::round((value2 - bmin[1]) / bsize[1]); i2 = true;}  // Ignore out-of-range values and Compute bin index
+		if (!(value1 < bmin[0] || value1 > bmax[0])) {index1 = static_cast<int>(std::round((value1 - bmin[0]) / bsize[0])); i1 = true;}  // Ignore out-of-range values and Compute bin index
+		if (!(value2 < bmin[1] || value2 > bmax[1])) {index2 = static_cast<int>(std::round((value2 - bmin[1]) / bsize[1])); i2 = true;}  // Ignore out-of-range values and Compute bin index
 
 		if (i1 && i2){
 			hist.matrix2D[index2][index1]++;  // Increment corresponding bin
@@ -532,8 +532,8 @@ void createParticles(Particle* particles, int particle_number, std::string* type
 	}
 }
 
-// Writes the electric and magnetic fields to the files according to the diagnostics
-void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, int& laser_number){
+// Writes the electric and magnetic fields to the files according to the diagnostics, ONLY OF THE FIRST LASER/FIELDS !!!
+void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers){
 
 	// Variable initialization
 	double dx, min, max, x;
@@ -547,15 +547,12 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
-		dir = fieldiag[5];
+		dir = static_cast<int>(fieldiag[5]);
 
 		// Create the eletric fields files
 		std::ofstream e_field_1("../output/e_field1.txt");
 		std::ofstream e_field_2("../output/e_field2.txt");
 		std::ofstream e_field_3("../output/e_field3.txt");
-
-		double t1 = 0.;
-		double pos1[3] = {2.,0,0};
 
 		// Write to the file
 		for (t = 0.; t < iter*dt; t = t + dt){
@@ -577,7 +574,7 @@ void FieldDiagWritter(double& dt, int& iter, double*& fieldiag, Laser*& lasers, 
 		dx = fieldiag[2]; 
 		min = fieldiag[3];
 		max = fieldiag[4];
-		dir = fieldiag[5];
+		dir = static_cast<int>(fieldiag[5]);
 
 		// Create the eletric fields files
 		std::ofstream b_field_1("../output/b_field1.txt");
