@@ -7,28 +7,11 @@ import re
 from matplotlib.widgets import Slider
 from python_helper import Reader as R
 
-def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
-    n = len(q)
-    t = np.linspace(0., dt*n, n)
 
-    plt.figure(figsize=(8,5))
-    plt.plot(t, q)
+def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0): 
+    
+    # Plots a 2D trajectory with colormap given by dt
 
-    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
-    plt.ylabel(ylabel, fontsize=16)
-    plt.title(Title, fontsize=18)
-
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
-
-    if isinstance(Lims, (list, tuple)):
-        plt.xlim((Lims[0][0], Lims[0][1]))
-        plt.ylim((Lims[1][0], Lims[1][1]))
-
-    plt.grid(Grid)
-    plt.show()
-
-def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
     n = len(x)
     t = np.linspace(dt, dt*n, n)
 
@@ -60,6 +43,9 @@ def plot_2D_traj(x, y, dt, Title = "", Grid = True, Lims = 0): #takes and array 
     plt.show()
 
 def plot_lots_2D_traj(x_arr, y_arr, dt, Title = "", Grid = True, Lims = 0):
+
+    # Plots N trajectories based on x_arr and y_arr in a 2D Plot
+
     N = len(x_arr)
     n = len(x_arr[0])
     t = np.linspace(dt, dt*n, n)
@@ -90,7 +76,10 @@ def plot_lots_2D_traj(x_arr, y_arr, dt, Title = "", Grid = True, Lims = 0):
 
     plt.show()
 
-def plot_3D_traj(x, y, z, dt, Title = "", Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
+def plot_3D_traj(x, y, z, dt, Title = "", Lims = 0):
+
+    #Plots a 3D scatter plot of 3 lists x,y,z with a color map given by dt
+
     n = len(x)
     t = np.linspace(dt, dt*n, n)
 
@@ -119,6 +108,9 @@ def plot_3D_traj(x, y, z, dt, Title = "", Lims = 0): #takes and array q of some 
     plt.show()
 
 def plot_lots_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
+
+    # Plots N trajectories in a 3D scatter plot with x_arr, y_arr, z_arr with colormap given by dt
+
     N = len(x_arr)  # Number of trajectories
     n = len(x_arr[0])  # Number of data points per trajectory
     t = np.linspace(dt, dt * n, n)  # Time array
@@ -149,6 +141,9 @@ def plot_lots_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
     plt.show()
 
 def plot_spin_sphere(s, dt, Title):
+
+    # Plots spin lists [(Sx1,Sy1,Sz1),....] on a sphere
+
     n = len(s.transpose()[0])
     t = np.linspace(0., dt*n, n)
 
@@ -175,7 +170,11 @@ def plot_spin_sphere(s, dt, Title):
     ax.tick_params(axis='both', labelsize=14)
     plt.show()
 
-def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"]): #takes and array of arrays q of some quantities and the time step between values and plots the data
+def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"]):
+    
+    # Plots N variables (can be positions, momenta, spin)
+    # on a 2D plot of the type (quantity, time)
+
     N = len(Q)
     if N != len(labels):
         labels = ["Quantity " + str(i + 1) for i in range(N)]
@@ -204,7 +203,10 @@ def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0
     plt.grid(Grid)
     plt.show()
 
-def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #takes and array q of some quantity and the time step between values and plots the data
+def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0):
+    
+    # Plots a given quantity with respect to time on a 2D plot
+
     n = len(q)
     t = np.linspace(0., dt*n, n)
 
@@ -225,39 +227,10 @@ def plot_v_time(q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0): #t
     plt.grid(Grid)
     plt.show()
 
-def plot_lots_v_time(Q, dt, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"]): #takes and array of arrays q of some quantities and the time step between values and plots the data
-    N = len(Q)
-    if N != len(labels):
-        labels = ["Quantity " + str(i + 1) for i in range(N)]
+def plot_lots_v_space(Q, dx, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"], space_axis="Space [$r_L$]"):
     
-    plt.figure(figsize=(8,5))
-    
-    for i in range(N):
-        q = Q[i]
-        n = len(q)
-        t = np.linspace(0., dt*n, n)
-        plt.plot(t, q, label = labels[i])
-        
-        
+    # Plots N qantities in a 2D plot with respect to each other
 
-    plt.xlabel('Time ($\omega t$)', fontsize=16) #I will eventually uncover our dimessions
-    plt.ylabel(ylabel, fontsize=16)
-    plt.title(Title, fontsize=18)
-    plt.legend(fontsize=15)
-
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
-
-    if isinstance(Lims, (list, tuple)):
-        plt.xlim((Lims[0][0], Lims[0][1]))
-        plt.ylim((Lims[1][0], Lims[1][1]))
-    array = np.full(len(Q[0]), 1/np.sqrt(2))
-    t = np.linspace(0., dt*n, n)
-    plt.plot(t,array, color="Black")
-    plt.grid(Grid)
-    plt.show()
-
-def plot_lots_v_space(Q, dx, Title = "", ylabel = "Values", Grid = True, Lims = 0, labels = ["Quantity 1", "Quantity 2"], space_axis="Space [$r_L$]"): #takes and array of arrays q of some quantities and the time step between values and plots the data
     N = len(Q)
     if N != len(labels):
         labels = ["Quantity " + str(i + 1) for i in range(N)]
@@ -286,12 +259,7 @@ def plot_lots_v_space(Q, dx, Title = "", ylabel = "Values", Grid = True, Lims = 
     plt.grid(Grid)
     plt.show()
 
-#num primeiro aproach precisamos de plots tipo quantidade vs tempo assumindo que recebe a lista de outputs e o dicionario de input do reader
-    #done
-
-#Depois tambem haveremos de precisar de histogramas para espaço de fases
-
-##FROM HERE ON OUT É SÓ PLOTTERS DE HISTOGRAMAS
+## histogram plotters ## 
 
 def plot_hists_through_time(variables, time_step):
 
