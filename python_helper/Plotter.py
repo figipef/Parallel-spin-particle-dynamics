@@ -140,6 +140,65 @@ def plot_lots_3D_traj(x_arr, y_arr, z_arr, dt, Title = "", Lims = 0):
 
     plt.show()
 
+def plot_lots_3D_traj_spin(x_arr, y_arr, z_arr, Sx_arr, Sy_arr, Sz_arr, dt, Title = "", Lims = 0):
+    """
+    Plots multiple 3D trajectories, where each trajectory has its own colormap.
+    
+    Parameters:
+    - x_arr, y_arr, z_arr: Lists of x, y, and z coordinates for each trajectory.
+    - Sx_arr, Sy_arr, Sz_arr: Lists of Sx, Sy, Sz spin values for each trajectory
+    - dt: Time step between values.
+    - Title: Plot title.
+    - Lims: Limits for the axes (optional).
+    """
+    N = len(x_arr)  # Number of trajectories
+    n = len(x_arr[0])  # Number of data points per trajectory
+    t = np.linspace(dt, dt * n, n)  # Time array
+
+    # Create a new figure for the plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # List of colormaps to choose from
+    #cmaps = ['copper_r', 'Blues', 'Oranges', 'Greens', 'Purples', 'Reds', 'Greys', 'YlOrBr', 'OrRd']
+
+    
+    for i in range(N):
+
+        Sx, Sy, Sz = np.array(Sx_arr[i]), np.array(Sy_arr[i]), np.array(Sz_arr[i])
+        
+        # Compute spherical coordinates for spin
+        phi = np.arctan2(Sy, Sx)
+        th = np.arccos(Sz / np.sqrt(Sx**2 + Sy**2 + Sz**2 + 1e-10))  # avoid division by 0
+        
+        # Get RGB colors
+        colors = hue_bright(th, phi)
+        ax.scatter(x_arr[i], y_arr[i], z_arr[i], c=colors, marker='o', s=1)
+        
+    # Set labels and title
+    ax.set_axis_off()
+    ax.set_xlabel('x [$c/\omega_0$]', fontsize=16)
+    ax.set_ylabel('y [$c/\omega_0$]', fontsize=16)
+    ax.set_zlabel('z [$c/\omega_0$]', fontsize=16)
+    ax.set_title(Title, fontsize=18)
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    # Adjust tick parameters
+    ax.tick_params(axis='both', labelsize=14)
+    ax.grid(False)
+    # Set limits if provided
+    if isinstance(Lims, (list, tuple)) and len(Lims) == 3:
+        ax.set_xlim(Lims[0])
+        ax.set_ylim(Lims[1])
+        ax.set_zlim(Lims[2])
+    else:
+        if Lims != 0:
+            print("Ignored limit indications due to incorrect data type being provided\n")
+
+    # Show plot
+    plt.show()
+
 def plot_spin_sphere(s, dt, Title):
 
     # Plots spin lists [(Sx1,Sy1,Sz1),....] on a sphere
